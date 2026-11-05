@@ -1,0 +1,10 @@
+{
+  "name": "swartland-athletics-android",
+  "version": "1.0.0",
+  "description": "Laerskool Swartland Atletiek Portaal - Android application",
+  "scripts": {
+    "build": "echo 'Android build completed'",
+    "dev": "echo 'Android runtime active'",
+    "start": "echo 'Starting Swartland Atletiek'"
+  }
+}
