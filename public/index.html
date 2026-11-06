@@ -565,6 +565,180 @@
     .drag-drop-zone:hover {
       background: rgba(244, 196, 48, 0.08);
     }
+    /* Large Modal for Digital Entry Sheet */
+    .modal-card-large {
+      background: var(--lss-navy-card);
+      border: 2px solid var(--lss-gold);
+      border-radius: 14px;
+      padding: 20px;
+      max-width: 96vw;
+      width: 1400px;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      text-align: left;
+    }
+
+    .modal-card-large-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 1px solid var(--lss-border);
+      padding-bottom: 10px;
+    }
+
+    .matrix-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      background: rgba(7, 18, 36, 0.6);
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--lss-border);
+    }
+
+    .matrix-table-wrapper {
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 56vh;
+      border: 1px solid var(--lss-border);
+      border-radius: 8px;
+      background: rgba(7, 18, 36, 0.8);
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .matrix-table th {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: 7px 8px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--lss-border);
+      border-right: 1px solid rgba(255,255,255,0.08);
+      user-select: none;
+    }
+
+    .matrix-table th.th-grp-info {
+      background: #061120;
+      color: var(--lss-gold);
+      text-align: left;
+    }
+
+    .matrix-table th.th-grp-track {
+      background: rgba(244, 196, 48, 0.22);
+      color: var(--lss-gold);
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    .matrix-table th.th-grp-field {
+      background: rgba(59, 130, 246, 0.22);
+      color: #93C5FD;
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    .matrix-table th.th-grp-hurdles {
+      background: rgba(239, 68, 68, 0.22);
+      color: #FCA5A5;
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    .matrix-table th.th-grp-walk {
+      background: rgba(16, 185, 129, 0.22);
+      color: #6EE7B7;
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    .matrix-table th.th-sub {
+      background: #09172e;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .matrix-table td {
+      padding: 4px 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.04);
+      vertical-align: middle;
+    }
+
+    .matrix-table tr:hover {
+      background: rgba(244, 196, 48, 0.05);
+    }
+
+    .matrix-input {
+      padding: 6px 8px;
+      background: #040c17;
+      border: 1px solid var(--lss-border);
+      border-radius: 4px;
+      color: var(--lss-text-light);
+      font-size: 12px;
+    }
+
+    .matrix-input:focus {
+      outline: none;
+      border-color: var(--lss-gold);
+    }
+
+    .matrix-check-cell {
+      text-align: center;
+      padding: 4px 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    .matrix-check-cell:hover {
+      background: rgba(244, 196, 48, 0.16);
+    }
+
+    .matrix-check-cell.checked {
+      background: rgba(244, 196, 48, 0.32);
+    }
+
+    .matrix-checkbox {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--lss-gold);
+    }
+
+    .btn-row-del {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #F87171;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.15s;
+    }
+
+    .btn-row-del:hover {
+      background: rgba(239, 68, 68, 0.35);
+      color: #fff;
+    }
+
   </style>
 </head>
 <body>
@@ -617,6 +791,14 @@
           <div class="stat-lbl" data-i18n="statRecords">Rekords</div>
         </div>
       </div>
+      <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn-primary" style="font-size: 13.5px; padding: 11px 18px; box-shadow: 0 4px 14px rgba(244,196,48,0.35);" onclick="openDigitalEntryModal()">
+          ✍️ <span data-i18n="btnHeroEnterAthletes">Skryf Atlete In (Digitale Sigblad - Merk Blokkie)</span>
+        </button>
+        <button class="btn-secondary" style="font-size: 13.5px; padding: 11px 16px;" onclick="switchTab('digitalSheet')">
+          📋 <span data-i18n="btnHeroViewSheet">Bekyk Sigblad Blad</span>
+        </button>
+      </div>
     </div>
   </section>
 
@@ -628,7 +810,7 @@
     <button class="tab-btn" onclick="switchTab('program')"><span data-i18n="tabProgram">📅 Program Rooster</span></button>
     <button class="tab-btn" onclick="switchTab('records')"><span data-i18n="tabRecords">📜 Rekords</span></button>
     <button class="tab-btn" onclick="switchTab('entries')"><span data-i18n="tabEntries">📝 Aanlyn Inskrywings</span></button>
-    <button class="tab-btn official-only" id="tabBulk" style="display: none;" onclick="switchTab('bulk')"><span data-i18n="tabBulk">📂 CSV Massainvoer</span></button>
+    <button class="tab-btn" id="tabDigitalSheet" onclick="switchTab('digitalSheet')"><span data-i18n="tabDigitalSheet">✍️ Digitale Sigblad</span></button>
     <button class="tab-btn official-only" id="tabOfficials" style="display: none;" onclick="switchTab('officials')"><span data-i18n="tabOfficials">⌨️ Beampte Tik-Portaal</span></button>
     <button class="tab-btn official-only" id="tabPrint" style="display: none;" onclick="switchTab('print')"><span data-i18n="tabPrint">🖨️ Drukkerystelsel</span></button>
   </nav>
@@ -914,64 +1096,115 @@
       </div>
     </div>
 
-    <!-- 7. BULK CSV IMPORT & EXCEL HELPER (MAKING CSV EASY) -->
-    <div id="view-bulk" class="view-section">
+    
+    <!-- 7. DIGITAL ENTRY SHEET (REPLACING CONFUSING RAW CSV) -->
+    <div id="view-digitalSheet" class="view-section">
       <div class="section-card">
         <div class="card-title">
-          <span data-i18n="bulkTitle">📂 Massainvoer van Atlete (CSV & Excel)</span>
-        </div>
-
-        <!-- Easy CSV Explanation Box -->
-        <div style="background: rgba(244, 196, 48, 0.08); border: 1px solid var(--lss-gold); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
-          <h4 style="color: var(--lss-gold); font-size: 13px; margin-bottom: 4px;" data-i18n="easyCsvHeader">💡 Maak CSV Maklik & Pynloos vir Beginners:</h4>
-          <p style="font-size: 12px; color: var(--lss-text-light); line-height: 1.5;" data-i18n="easyCsvDesc">
-            Jy hoef nie met ingewikkelde kommas te sukkel nie! Kies eenvoudig jou rye in <strong>Microsoft Excel of Google Sigblaaie</strong>, druk <strong>Ctrl+C (Kopieer)</strong>, en klik hieronder op <strong>"Plak vanaf Excel"</strong>. Ons stelsel verwerk die kolomme outomaties!
-          </p>
-        </div>
-
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;">
-          <button class="btn-primary" onclick="downloadOfficialExcelTemplate()">
-            📥 <span data-i18n="btnDownloadTemplate">Laai Amptelike Excel-Sjabloon Af</span>
-          </button>
-          <button class="btn-secondary" onclick="openPasteExcelModal()">
-            📋 <span data-i18n="btnPasteExcel">Plak direk vanaf Excel (Ctrl+V)</span>
+          <div>
+            <span data-i18n="digitalSheetTitle">✍️ Digitale Inskrywings Sigblad (Merk Blokkie)</span>
+            <div style="font-size: 12px; color: var(--lss-text-muted); font-weight: normal; margin-top: 2px;" data-i18n="digitalSheetSub">
+              Voer atlete in of plak name. Merk items eenvoudig met 'n regmerkie (☑️) in die tabel sonder enige CSV-lêers.
+            </div>
+          </div>
+          <button class="btn-primary" onclick="openDigitalEntryModal()">
+            ⤢ <span data-i18n="btnExpandModal">Maak Oop in Groot Venster</span>
           </button>
         </div>
 
-        <!-- Drag and drop zone for CSV file -->
-        <div class="drag-drop-zone" onclick="document.getElementById('csvFileInput').click()">
-          <input type="file" id="csvFileInput" accept=".csv,.txt" style="display: none;" onchange="handleCsvFileSelected(event)">
-          <div style="font-size: 28px; margin-bottom: 6px;">📄</div>
-          <strong style="color: var(--lss-gold);" data-i18n="dragDropTitle">Klik of Sleep 'n CSV-lêer hierheen</strong>
-          <p style="font-size: 12px; color: var(--lss-text-muted); margin-top: 4px;" data-i18n="dragDropSub">
-            Ondersteun die Laerskool Swartland Inskrywingsdokument (Prentjie 1 formaat met 'x' merke) of gewone CSV.
-          </p>
-        </div>
-
-        <!-- CSV Preview Table -->
-        <div id="bulkPreviewContainer" style="display: none; margin-top: 16px;">
-          <div class="card-title">
-            <span id="bulkPreviewCount" style="color: var(--lss-green);">0 Atlete Gevind</span>
-            <button class="btn-primary" id="btnConfirmBulkImport" onclick="confirmBulkImport()">
-              ✅ <span data-i18n="btnConfirmImport">Voer Alles In na Firestore</span>
+        <!-- Matrix Toolbar -->
+        <div class="matrix-toolbar">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <label style="font-size: 12px; color: var(--lss-text-muted);" data-i18n="lblDefaultSchool">Verstek Skool:</label>
+            <input type="text" id="pageDefaultSchoolInput" class="matrix-input" value="Laerskool Swartland" style="width: 180px;">
+            <button class="btn-secondary" style="padding: 5px 10px; font-size: 12px;" onclick="applySchoolToAll(document.getElementById('pageDefaultSchoolInput').value)">
+              ⚡ <span data-i18n="btnApplySchoolToAll">Pas Skool Toe op Almal</span>
             </button>
           </div>
-          <div style="overflow-x: auto; max-height: 320px;">
-            <table class="styled-table" id="tableBulkPreview">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Voornaam</th>
-                  <th>Van</th>
-                  <th>Skool</th>
-                  <th>Geslag</th>
-                  <th>Oud.</th>
-                  <th>Gekose Items</th>
-                </tr>
-              </thead>
-              <tbody id="tbodyBulkPreview"></tbody>
-            </table>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="openPasteNamesModal()">
+              📋 <span data-i18n="btnPasteNames">Plak Name vanaf Lys / Knipbord</span>
+            </button>
+            <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="addDigitalSheetRow()">
+              ➕ <span data-i18n="btnAddRow">Voeg Atleet-Ry By</span>
+            </button>
+            <button class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="saveAllDigitalSheetEntries()">
+              💾 <span data-i18n="btnSaveAllEntries">Stoor & Registreer na Byeenkoms</span>
+            </button>
           </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="matrix-table-wrapper" id="pageMatrixTableWrapper">
+          <table class="matrix-table" id="pageMatrixTable">
+            <thead>
+              <!-- Category Header Row -->
+              <tr>
+                <th colspan="6" class="th-grp-info" data-i18n="grpAthleteDetails">1. Atleet Besonderhede</th>
+                <th colspan="9" class="th-grp-track">🏃 Hardloop (Track)</th>
+                <th colspan="5" class="th-grp-field">🎯 Velditems (Field)</th>
+                <th colspan="5" class="th-grp-hurdles">🚧 Hekkies</th>
+                <th colspan="1" class="th-grp-walk">🚶 Stap</th>
+                <th colspan="1" class="th-grp-info">Aksie</th>
+              </tr>
+              <!-- Column Sub-Header Row -->
+              <tr>
+                <th class="th-sub" style="width: 35px;">#</th>
+                <th class="th-sub" style="min-width: 110px;" data-i18n="colFirstName">Voornaam</th>
+                <th class="th-sub" style="min-width: 110px;" data-i18n="colLastName">Van</th>
+                <th class="th-sub" style="min-width: 140px;" data-i18n="colSchool">Skool</th>
+                <th class="th-sub" style="min-width: 80px;" data-i18n="colGender">Geslag</th>
+                <th class="th-sub" style="min-width: 65px;" data-i18n="colAge">Oud.</th>
+                <!-- Track 9 items -->
+                <th class="th-sub">50m</th>
+                <th class="th-sub">60m</th>
+                <th class="th-sub">80m</th>
+                <th class="th-sub">100m</th>
+                <th class="th-sub">150m</th>
+                <th class="th-sub">200m</th>
+                <th class="th-sub">1200m</th>
+                <th class="th-sub">1500m</th>
+                <th class="th-sub">4x100m</th>
+                <!-- Field 5 items -->
+                <th class="th-sub">Verspring</th>
+                <th class="th-sub">Hoogspring</th>
+                <th class="th-sub">Gewigstoot</th>
+                <th class="th-sub">Skyfwerp</th>
+                <th class="th-sub">Spiesgooi</th>
+                <!-- Hurdles 5 items -->
+                <th class="th-sub">70mH</th>
+                <th class="th-sub">75mH</th>
+                <th class="th-sub">80mH</th>
+                <th class="th-sub">150mH</th>
+                <th class="th-sub">200mH</th>
+                <!-- Walk 1 item -->
+                <th class="th-sub">1500m Stap</th>
+                <th class="th-sub" style="width: 45px;">Skrap</th>
+              </tr>
+            </thead>
+            <tbody id="pageMatrixTableBody">
+              <!-- Dynamically Rendered -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Matrix Bottom Actions -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; flex-wrap: wrap; gap: 10px;">
+          <div style="font-size: 13px; color: var(--lss-gold); font-weight: 700;" id="pageMatrixCount">
+            0 Atlete op sigblad
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-secondary" onclick="addDigitalSheetRow()">➕ <span data-i18n="btnAddRow">Voeg Atleet By</span></button>
+            <button class="btn-primary" onclick="saveAllDigitalSheetEntries()">💾 <span data-i18n="btnSaveAllEntries">Stoor & Registreer na Byeenkoms</span></button>
+          </div>
+        </div>
+
+        <!-- Optional blank template download accordion/note -->
+        <div style="margin-top: 24px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 12px; color: var(--lss-text-muted);">
+          <span>📁 Het 'n skool nog die ou Excel-sjabloon nodig?</span>
+          <a href="javascript:void(0)" onclick="downloadOfficialExcelTemplate()" style="color: var(--lss-gold); margin-left: 6px; text-decoration: underline;">
+            Laai Blanko Excel-Sjabloon Af (Opsioneel)
+          </a>
         </div>
       </div>
     </div>
@@ -1121,7 +1354,396 @@
     </div>
   </div>
 
+
+  <!-- Pop-Up Window: Large Digital Entry Sheet Modal -->
+  <div class="modal-overlay" id="modalDigitalEntrySheet">
+    <div class="modal-card-large">
+      <div class="modal-card-large-header">
+        <div>
+          <h3 style="color: var(--lss-gold); font-size: 18px;" data-i18n="modalDigitalTitle">✍️ Digitale Inskrywings Sigblad (Merk Blokkie)</h3>
+          <p style="font-size: 12px; color: var(--lss-text-muted); margin-top: 2px;" data-i18n="modalDigitalSub">
+            Tik atlete in of plak name. Merk items eenvoudig met 'n regmerkie (☑️) in die tabel sonder enige CSV-lêers.
+          </p>
+        </div>
+        <button class="btn-secondary" style="padding: 4px 10px;" onclick="closeDigitalEntryModal()">✕</button>
+      </div>
+
+      <!-- Modal Toolbar -->
+      <div class="matrix-toolbar">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <label style="font-size: 12px; color: var(--lss-text-muted);" data-i18n="lblDefaultSchool">Verstek Skool:</label>
+          <input type="text" id="modalDefaultSchoolInput" class="matrix-input" value="Laerskool Swartland" style="width: 170px;">
+          <button class="btn-secondary" style="padding: 5px 10px; font-size: 12px;" onclick="applySchoolToAll(document.getElementById('modalDefaultSchoolInput').value)">
+            ⚡ <span data-i18n="btnApplySchoolToAll">Pas Skool Toe op Almal</span>
+          </button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="openPasteNamesModal()">
+            📋 <span data-i18n="btnPasteNames">Plak Name vanaf Lys</span>
+          </button>
+          <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="addDigitalSheetRow()">
+            ➕ <span data-i18n="btnAddRow">Voeg Atleet By</span>
+          </button>
+          <button class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="saveAllDigitalSheetEntries()">
+            💾 <span data-i18n="btnSaveAllEntries">Stoor na Byeenkoms</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Matrix Table Wrapper in Modal -->
+      <div class="matrix-table-wrapper" id="modalMatrixTableWrapper">
+        <table class="matrix-table" id="modalMatrixTable">
+          <thead>
+            <tr>
+              <th colspan="6" class="th-grp-info" data-i18n="grpAthleteDetails">1. Atleet Besonderhede</th>
+              <th colspan="9" class="th-grp-track">🏃 Hardloop (Track)</th>
+              <th colspan="5" class="th-grp-field">🎯 Velditems (Field)</th>
+              <th colspan="5" class="th-grp-hurdles">🚧 Hekkies</th>
+              <th colspan="1" class="th-grp-walk">🚶 Stap</th>
+              <th colspan="1" class="th-grp-info">Aksie</th>
+            </tr>
+            <tr>
+              <th class="th-sub" style="width: 35px;">#</th>
+              <th class="th-sub" style="min-width: 110px;" data-i18n="colFirstName">Voornaam</th>
+              <th class="th-sub" style="min-width: 110px;" data-i18n="colLastName">Van</th>
+              <th class="th-sub" style="min-width: 140px;" data-i18n="colSchool">Skool</th>
+              <th class="th-sub" style="min-width: 80px;" data-i18n="colGender">Geslag</th>
+              <th class="th-sub" style="min-width: 65px;" data-i18n="colAge">Oud.</th>
+              <!-- Track -->
+              <th class="th-sub">50m</th>
+              <th class="th-sub">60m</th>
+              <th class="th-sub">80m</th>
+              <th class="th-sub">100m</th>
+              <th class="th-sub">150m</th>
+              <th class="th-sub">200m</th>
+              <th class="th-sub">1200m</th>
+              <th class="th-sub">1500m</th>
+              <th class="th-sub">4x100m</th>
+              <!-- Field -->
+              <th class="th-sub">Verspring</th>
+              <th class="th-sub">Hoogspring</th>
+              <th class="th-sub">Gewigstoot</th>
+              <th class="th-sub">Skyfwerp</th>
+              <th class="th-sub">Spiesgooi</th>
+              <!-- Hurdles -->
+              <th class="th-sub">70mH</th>
+              <th class="th-sub">75mH</th>
+              <th class="th-sub">80mH</th>
+              <th class="th-sub">150mH</th>
+              <th class="th-sub">200mH</th>
+              <!-- Walk -->
+              <th class="th-sub">1500m Stap</th>
+              <th class="th-sub" style="width: 45px;">Skrap</th>
+            </tr>
+          </thead>
+          <tbody id="modalMatrixTableBody">
+            <!-- Dynamically Rendered -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Modal Footer -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; flex-wrap: wrap; gap: 10px;">
+        <div style="font-size: 13px; color: var(--lss-gold); font-weight: 700;" id="modalMatrixCount">
+          0 Atlete op sigblad
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-secondary" onclick="closeDigitalEntryModal()" data-i18n="btnClose">Sluit</button>
+          <button class="btn-primary" onclick="saveAllDigitalSheetEntries()" id="btnModalSaveEntries">
+            💾 <span data-i18n="btnSaveAllEntries">Stoor & Registreer na Byeenkoms</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Paste Names Modal -->
+  <div class="modal-overlay" id="modalPasteNames">
+    <div class="modal-card" style="max-width: 500px; text-align: left;">
+      <h3 style="color: var(--lss-gold); margin-bottom: 6px;" data-i18n="pasteNamesTitle">📋 Plak Name vanaf Lys</h3>
+      <p style="font-size: 12px; color: var(--lss-text-muted); margin-bottom: 12px;" data-i18n="pasteNamesSub">
+        Kopieer 'n lys van atleetname uit Word, WhatsApp of Excel en plak dit hieronder (een per lyn of Voornaam en Van):
+      </p>
+      <textarea id="pasteNamesInput" class="form-control" rows="8" placeholder="Pieter Smit&#10;Johan Botha&#10;Lize van Zyl&#10;Mia du Plessis" style="font-size: 13px; line-height: 1.5;"></textarea>
+      
+      <div class="form-row" style="margin-top: 10px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label style="font-size: 11px;" data-i18n="lblDefaultGender">Verstek Geslag:</label>
+          <select id="pasteDefaultGender" class="form-control" style="padding: 6px 8px; font-size: 12px;">
+            <option value="Seuns">Seuns</option>
+            <option value="Dogters">Dogters</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label style="font-size: 11px;" data-i18n="lblDefaultAge">Verstek Ouderdom:</label>
+          <select id="pasteDefaultAge" class="form-control" style="padding: 6px 8px; font-size: 12px;">
+            <option value="7">o/7</option>
+            <option value="8">o/8</option>
+            <option value="9">o/9</option>
+            <option value="10">o/10</option>
+            <option value="11">o/11</option>
+            <option value="12">o/12</option>
+            <option value="13" selected>o/13</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
+        <button class="btn-secondary" onclick="closePasteNamesModal()" data-i18n="btnCancel">Kanselleer</button>
+        <button class="btn-primary" onclick="processPastedNames()" data-i18n="btnGenerateRows">Voeg Name By Sigblad</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    
+    // 3. Digital Sheet Matrix State & Operations (Replacing CSV with Interactive Checkboxes)
+    const DIGITAL_EVENTS = [
+      "50m", "60m", "80m", "100m", "150m", "200m", "1200m", "1500m", "4x100m",
+      "Verspring", "Hoogspring", "Gewigstoot", "Skyfwerp", "Spiesgooi",
+      "70mH", "75mH", "80mH", "150mH", "200mH", "1500m Stap"
+    ];
+
+    let digitalRows = [
+      { id: "row_1", firstName: "", lastName: "", school: "Laerskool Swartland", gender: "Seuns", ageGroup: "13", events: new Set() },
+      { id: "row_2", firstName: "", lastName: "", school: "Laerskool Swartland", gender: "Dogters", ageGroup: "12", events: new Set() },
+      { id: "row_3", firstName: "", lastName: "", school: "Laerskool Swartland", gender: "Seuns", ageGroup: "11", events: new Set() }
+    ];
+
+    function openDigitalEntryModal() {
+      document.getElementById("modalDigitalEntrySheet").classList.add("active");
+      renderDigitalSheet();
+    }
+
+    function closeDigitalEntryModal() {
+      document.getElementById("modalDigitalEntrySheet").classList.remove("active");
+      renderDigitalSheet();
+    }
+
+    function addDigitalSheetRow(firstName = "", lastName = "", school = "", gender = "Seuns", ageGroup = "13", events = []) {
+      const defaultSchool = document.getElementById("pageDefaultSchoolInput") ? document.getElementById("pageDefaultSchoolInput").value.trim() : "Laerskool Swartland";
+      const newRow = {
+        id: "row_" + Date.now() + "_" + Math.random().toString(36).substr(2, 4),
+        firstName: firstName,
+        lastName: lastName,
+        school: school || defaultSchool || "Laerskool Swartland",
+        gender: gender || "Seuns",
+        ageGroup: ageGroup || "13",
+        events: new Set(events)
+      };
+      digitalRows.push(newRow);
+      renderDigitalSheet();
+    }
+
+    function deleteDigitalSheetRow(rowId) {
+      digitalRows = digitalRows.filter(r => r.id !== rowId);
+      if (digitalRows.length === 0) {
+        addDigitalSheetRow();
+      } else {
+        renderDigitalSheet();
+      }
+    }
+
+    function toggleDigitalEvent(rowId, eventName) {
+      const row = digitalRows.find(r => r.id === rowId);
+      if (!row) return;
+      if (row.events.has(eventName)) {
+        row.events.delete(eventName);
+      } else {
+        row.events.add(eventName);
+      }
+      renderDigitalSheet();
+    }
+
+    function updateRowField(rowId, field, value) {
+      const row = digitalRows.find(r => r.id === rowId);
+      if (!row) return;
+      row[field] = value;
+    }
+
+    function applySchoolToAll(schoolName) {
+      if (!schoolName) return;
+      digitalRows.forEach(r => r.school = schoolName);
+      if (document.getElementById("pageDefaultSchoolInput")) document.getElementById("pageDefaultSchoolInput").value = schoolName;
+      if (document.getElementById("modalDefaultSchoolInput")) document.getElementById("modalDefaultSchoolInput").value = schoolName;
+      renderDigitalSheet();
+      alert(`✅ Skool "${schoolName}" suksesvol toegepas op alle atlete.`);
+    }
+
+    function openPasteNamesModal() {
+      document.getElementById("modalPasteNames").classList.add("active");
+      document.getElementById("pasteNamesInput").value = "";
+      document.getElementById("pasteNamesInput").focus();
+    }
+
+    function closePasteNamesModal() {
+      document.getElementById("modalPasteNames").classList.remove("active");
+    }
+
+    function processPastedNames() {
+      const text = document.getElementById("pasteNamesInput").value.trim();
+      if (!text) return;
+      const defGender = document.getElementById("pasteDefaultGender").value;
+      const defAge = document.getElementById("pasteDefaultAge").value;
+      const defSchool = document.getElementById("pageDefaultSchoolInput") ? document.getElementById("pageDefaultSchoolInput").value.trim() : "Laerskool Swartland";
+
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+      let count = 0;
+
+      lines.forEach(line => {
+        // Handle tab, comma, or space separation
+        let fn = "", ln = "";
+        if (line.includes("\t")) {
+          const parts = line.split("\t").map(p => p.trim());
+          fn = parts[0] || "";
+          ln = parts[1] || "";
+        } else if (line.includes(",")) {
+          const parts = line.split(",").map(p => p.trim());
+          fn = parts[0] || "";
+          ln = parts[1] || "";
+        } else {
+          const parts = line.split(/\s+/);
+          if (parts.length >= 2) {
+            fn = parts[0];
+            ln = parts.slice(1).join(" ");
+          } else {
+            fn = line;
+            ln = "";
+          }
+        }
+
+        if (fn || ln) {
+          digitalRows.push({
+            id: "row_" + Date.now() + "_" + Math.random().toString(36).substr(2, 4),
+            firstName: fn,
+            lastName: ln,
+            school: defSchool,
+            gender: defGender,
+            ageGroup: defAge,
+            events: new Set()
+          });
+          count++;
+        }
+      });
+
+      closePasteNamesModal();
+      renderDigitalSheet();
+      alert(`✅ ${count} atlete suksesvol bygevoeg! Jy kan nou bloot die blokkies merk vir hul items.`);
+    }
+
+    function renderDigitalSheet() {
+      renderTableIntoBody("pageMatrixTableBody");
+      renderTableIntoBody("modalMatrixTableBody");
+
+      const countMsg = `${digitalRows.length} Atlete op sigblad gereed`;
+      if (document.getElementById("pageMatrixCount")) document.getElementById("pageMatrixCount").innerText = countMsg;
+      if (document.getElementById("modalMatrixCount")) document.getElementById("modalMatrixCount").innerText = countMsg;
+    }
+
+    function renderTableIntoBody(tbodyId) {
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+
+      let html = "";
+      digitalRows.forEach((row, idx) => {
+        const isBoy = row.gender === "Seuns";
+        let checkCells = "";
+
+        DIGITAL_EVENTS.forEach(ev => {
+          const isChecked = row.events.has(ev);
+          const checkedClass = isChecked ? " checked" : "";
+          checkCells += `
+            <td class="matrix-check-cell${checkedClass}" onclick="toggleDigitalEvent('${row.id}', '${ev}')">
+              <input type="checkbox" class="matrix-checkbox" ${isChecked ? "checked" : ""} onclick="event.stopPropagation(); toggleDigitalEvent('${row.id}', '${ev}')">
+            </td>
+          `;
+        });
+
+        html += `
+          <tr>
+            <td style="text-align: center; font-weight: 700; color: var(--lss-gold);">${idx + 1}</td>
+            <td>
+              <input type="text" class="matrix-input" value="${escapeHtml(row.firstName)}" placeholder="bv. Johan" style="width: 100px;" oninput="updateRowField('${row.id}', 'firstName', this.value)">
+            </td>
+            <td>
+              <input type="text" class="matrix-input" value="${escapeHtml(row.lastName)}" placeholder="bv. Smit" style="width: 100px;" oninput="updateRowField('${row.id}', 'lastName', this.value)">
+            </td>
+            <td>
+              <input type="text" class="matrix-input" value="${escapeHtml(row.school)}" placeholder="bv. Laerskool Swartland" style="width: 130px;" oninput="updateRowField('${row.id}', 'school', this.value)">
+            </td>
+            <td>
+              <select class="matrix-input" style="width: 80px;" onchange="updateRowField('${row.id}', 'gender', this.value)">
+                <option value="Seuns" ${isBoy ? "selected" : ""}>Seuns</option>
+                <option value="Dogters" ${!isBoy ? "selected" : ""}>Dogters</option>
+              </select>
+            </td>
+            <td>
+              <select class="matrix-input" style="width: 60px;" onchange="updateRowField('${row.id}', 'ageGroup', this.value)">
+                ${[7,8,9,10,11,12,13].map(ag => `<option value="${ag}" ${row.ageGroup == ag ? "selected" : ""}>o/${ag}</option>`).join("")}
+              </select>
+            </td>
+            ${checkCells}
+            <td style="text-align: center;">
+              <button class="btn-row-del" onclick="deleteDigitalSheetRow('${row.id}')" title="Skrap ry">✕</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    async function saveAllDigitalSheetEntries() {
+      // Validate that at least one athlete has valid name
+      const validRows = digitalRows.filter(r => (r.firstName || "").trim().length > 0);
+      if (validRows.length === 0) {
+        alert("Tik asseblief ten minste een atleet se naam en van in voordat jy stoor.");
+        return;
+      }
+
+      // Check if any row has zero events ticked
+      const noEvents = validRows.filter(r => r.events.size === 0);
+      if (noEvents.length > 0) {
+        if (!confirm(`Let wel: ${noEvents.length} atlete het tans geen items gemerk nie. Wil jy steeds voortgaan en alle geldige atlete stoor?`)) {
+          return;
+        }
+      }
+
+      const saveBtn1 = document.getElementById("btnModalSaveEntries");
+      if (saveBtn1) { saveBtn1.disabled = true; saveBtn1.innerText = "Stoor tans na Firestore..."; }
+
+      try {
+        const batch = db.batch();
+        validRows.forEach((ath, idx) => {
+          const docId = "ath_sigblad_" + Date.now() + "_" + idx;
+          const docRef = db.collection("athletes").doc(docId);
+          batch.set(docRef, {
+            firstName: (ath.firstName || "").trim(),
+            lastName: (ath.lastName || "").trim(),
+            school: (ath.school || "").trim() || "Laerskool Swartland",
+            gender: ath.gender || "Seuns",
+            ageGroup: ath.ageGroup || "13",
+            events: Array.from(ath.events),
+            userId: "digital_sheet_entry",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        });
+
+        await batch.commit();
+        alert(`🎉 Sukses! ${validRows.length} atlete met hul gekose items is suksesvol in Firestore geregistreer!`);
+        closeDigitalEntryModal();
+      } catch (err) {
+        alert("Fout met stoor van inskrywings: " + err.message);
+      } finally {
+        if (saveBtn1) { saveBtn1.disabled = false; saveBtn1.innerText = "💾 Stoor & Registreer na Byeenkoms"; }
+      }
+    }
+
     // 1. Language Dictionary (Afrikaans & English)
     let currentLang = "af";
     const i18n = {
@@ -1143,6 +1765,26 @@
         tabBulk: "📂 CSV Massainvoer",
         tabOfficials: "⌨️ Beampte Tik-Portaal",
         tabPrint: "🖨️ Drukkerystelsel",
+        btnHeroEnterAthletes: "Skryf Atlete In (Digitale Sigblad - Merk Blokkie)",
+        btnHeroViewSheet: "Bekyk Sigblad Blad",
+        tabDigitalSheet: "✍️ Digitale Sigblad",
+        digitalSheetTitle: "✍️ Digitale Inskrywings Sigblad (Merk Blokkie)",
+        digitalSheetSub: "Voer atlete in of plak name. Merk items eenvoudig met 'n regmerkie (☑️) in die tabel sonder enige CSV-lêers.",
+        btnExpandModal: "Maak Oop in Groot Venster",
+        lblDefaultSchool: "Verstek Skool:",
+        btnApplySchoolToAll: "Pas Skool Toe op Almal",
+        btnPasteNames: "Plak Name vanaf Lys / Knipbord",
+        btnAddRow: "Voeg Atleet-Ry By",
+        btnSaveAllEntries: "Stoor & Registreer na Byeenkoms",
+        grpAthleteDetails: "1. Atleet Besonderhede",
+        modalDigitalTitle: "✍️ Digitale Inskrywings Sigblad (Merk Blokkie)",
+        modalDigitalSub: "Tik atlete in of plak name. Merk items eenvoudig met 'n regmerkie (☑️) in die tabel sonder enige CSV-lêers.",
+        pasteNamesTitle: "📋 Plak Name vanaf Lys",
+        pasteNamesSub: "Kopieer 'n lys van atleetname uit Word, WhatsApp of Excel en plak dit hieronder (een per lyn of Voornaam en Van):",
+        btnGenerateRows: "Voeg Name By Sigblad",
+        lblDefaultGender: "Verstek Geslag:",
+        lblDefaultAge: "Verstek Ouderdom:",
+        btnClose: "Sluit",
         resultsTitle: "⏱️ Jongste Uitslae (Lewendig op die Veld)",
         resultsSub: "Outomaties bygewerk via Firestore",
         colPlace: "Plek",
@@ -1240,6 +1882,26 @@
         tabBulk: "📂 Bulk CSV Import",
         tabOfficials: "⌨️ Official Entry Portal",
         tabPrint: "🖨️ Print Center",
+        btnHeroEnterAthletes: "Enter Athletes (Digital Sheet - Tick Boxes)",
+        btnHeroViewSheet: "View Digital Sheet",
+        tabDigitalSheet: "✍️ Digital Sheet",
+        digitalSheetTitle: "✍️ Digital Entry Sheet (Tick Boxes)",
+        digitalSheetSub: "Enter athletes or paste names. Simply tick event boxes (☑️) in the table without any CSV files.",
+        btnExpandModal: "Open in Full Window",
+        lblDefaultSchool: "Default School:",
+        btnApplySchoolToAll: "Apply School to All",
+        btnPasteNames: "Paste Names from List / Clipboard",
+        btnAddRow: "Add Athlete Row",
+        btnSaveAllEntries: "Save & Register to Meet",
+        grpAthleteDetails: "1. Athlete Details",
+        modalDigitalTitle: "✍️ Digital Entry Sheet (Tick Boxes)",
+        modalDigitalSub: "Enter athletes or paste names. Simply tick event boxes (☑️) in the table without any CSV files.",
+        pasteNamesTitle: "📋 Paste Names from List",
+        pasteNamesSub: "Copy athlete names from Word, WhatsApp, or Excel and paste below (one per line):",
+        btnGenerateRows: "Add Names to Sheet",
+        lblDefaultGender: "Default Gender:",
+        lblDefaultAge: "Default Age:",
+        btnClose: "Close",
         resultsTitle: "⏱️ Latest Results (Live from Field & Track)",
         resultsSub: "Automatically updated via Firestore",
         colPlace: "Place",
@@ -2049,6 +2711,7 @@ Ouderdom,Voornaam,Van,Skool,50m,60m,80m,100m,150m,200m,1200m,1500m,4x100m Relay,
       initRealtimeStreams();
       updateRoleUI();
       renderEventPills();
+      renderDigitalSheet();
     });
   </script>
 </body>

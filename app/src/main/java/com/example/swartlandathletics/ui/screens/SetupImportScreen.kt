@@ -3,12 +3,17 @@ package com.example.swartlandathletics.ui.screens
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -21,6 +26,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.swartlandathletics.data.AthleticsRepository
 import com.example.swartlandathletics.model.AppConstants
 import com.example.swartlandathletics.model.Athlete
@@ -31,6 +38,16 @@ import com.example.swartlandathletics.util.AppLanguage
 import com.example.swartlandathletics.util.CsvManager
 import com.example.swartlandathletics.util.L10n
 import com.example.swartlandathletics.util.LanguageManager
+
+data class DigitalAthleteRow(
+    val id: String = java.util.UUID.randomUUID().toString(),
+    var firstName: String = "",
+    var lastName: String = "",
+    var school: String = "Laerskool Swartland",
+    var gender: String = "Seuns",
+    var ageGroup: String = "13",
+    var events: MutableSet<String> = mutableSetOf()
+)
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -57,6 +74,21 @@ fun SetupImportScreen(
     var inputAge by remember { mutableStateOf("13") }
     var selectedEvents by remember { mutableStateOf(setOf<String>()) }
     var statusMessage by remember { mutableStateOf<String?>(null) }
+
+    // Digital Entry Sheet State (Interactive pop-up matrix with checkboxes - replaces raw CSV upload)
+    var showDigitalSheetDialog by remember { mutableStateOf(false) }
+    var digitalDefaultSchool by remember { mutableStateOf("Laerskool Swartland") }
+    var digitalRows by remember {
+        mutableStateOf(
+            listOf(
+                DigitalAthleteRow(school = "Laerskool Swartland", gender = "Seuns", ageGroup = "13"),
+                DigitalAthleteRow(school = "Laerskool Swartland", gender = "Seuns", ageGroup = "13"),
+                DigitalAthleteRow(school = "Laerskool Swartland", gender = "Dogters", ageGroup = "13")
+            )
+        )
+    }
+    var showQuickNamePasteDialog by remember { mutableStateOf(false) }
+    var quickNamePasteContent by remember { mutableStateOf("") }
 
     // Bulk Import / Export States
     val records by AthleticsRepository.records.collectAsState()
@@ -172,7 +204,7 @@ fun SetupImportScreen(
             Tab(
                 selected = selectedTab == 2,
                 onClick = { selectedTab = 2 },
-                text = { Text(if (isEnglish) "Excel / CSV" else "Sigblaaie & Data", fontSize = 12.sp, maxLines = 1) }
+                text = { Text(if (isEnglish) "✍️ Digital Sheet" else "✍️ Digitale Sigblad", fontSize = 12.sp, maxLines = 1) }
             )
         }
 
@@ -219,6 +251,48 @@ fun SetupImportScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showDigitalSheetDialog = true }
+                                .testTag("btn_open_digital_sheet_tab0"),
+                            colors = CardDefaults.cardColors(containerColor = LssGold.copy(alpha = 0.15f)),
+                            border = BorderStroke(1.5.dp, LssGold),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier.size(36.dp).background(LssGold, RoundedCornerShape(8.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Default.Edit, contentDescription = null, tint = LssNavyHeader, modifier = Modifier.size(20.dp))
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = if (isEnglish) "✍️ Open Digital Entry Sheet (Tick Items)" else "✍️ Maak Digitale Sigblad Oop (Merk Items)",
+                                        color = LssGold,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp
+                                    )
+                                    Text(
+                                        text = if (isEnglish)
+                                            "Enter athletes in bulk and tick checkboxes under each event. No CSV!"
+                                        else
+                                            "Voer atlete in grootmaat in en merk blokkies onder elke item. Geen CSV!",
+                                        color = LssTextLight,
+                                        fontSize = 11.sp
+                                    )
+                                }
+                                Icon(Icons.Default.ArrowForward, contentDescription = null, tint = LssGold, modifier = Modifier.size(16.dp))
+                            }
+                        }
+                    }
+
                     item {
                         Card(
                             colors = CardDefaults.cardColors(containerColor = LssNavyCard),
@@ -373,6 +447,48 @@ fun SetupImportScreen(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
                         )
+                    }
+
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showDigitalSheetDialog = true }
+                                .testTag("btn_open_digital_sheet_tab1"),
+                            colors = CardDefaults.cardColors(containerColor = LssGold.copy(alpha = 0.15f)),
+                            border = BorderStroke(1.5.dp, LssGold),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier.size(36.dp).background(LssGold, RoundedCornerShape(8.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Default.Edit, contentDescription = null, tint = LssNavyHeader, modifier = Modifier.size(20.dp))
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = if (isEnglish) "✍️ Open Digital Entry Sheet (Multiple Athletes)" else "✍️ Maak Digitale Sigblad Oop (Veelvuldige Atlete)",
+                                        color = LssGold,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp
+                                    )
+                                    Text(
+                                        text = if (isEnglish)
+                                            "Prefer spreadsheet entry? Enter bulk athletes and tick event boxes!"
+                                        else
+                                            "Verkies jy 'n sigblad? Tik atlete in en merk blokkies vir elke item!",
+                                        color = LssTextLight,
+                                        fontSize = 11.sp
+                                    )
+                                }
+                                Icon(Icons.Default.ArrowForward, contentDescription = null, tint = LssGold, modifier = Modifier.size(16.dp))
+                            }
+                        }
                     }
 
                     item {
@@ -547,42 +663,382 @@ fun SetupImportScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
-                    // CARD 1: ATHLETE ENTRY SPREADSHEET (IMAGE 1: MATRIX WITH 'X' TICKS)
+                    // CARD 1: INTERACTIVE DIGITAL ENTRY SHEET (CHECKBOXES MATRIX - NO CSV NEEDED)
+                    item {
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = LssNavyCard),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.5.dp, LssGold)
+                        ) {
+                            Column(modifier = Modifier.padding(14.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Box(
+                                            modifier = Modifier.size(34.dp).background(LssGold, RoundedCornerShape(8.dp)),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(Icons.Default.Edit, contentDescription = null, tint = LssNavyHeader, modifier = Modifier.size(20.dp))
+                                        }
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                        Column {
+                                            Text(
+                                                text = if (isEnglish) "✍️ Interactive Digital Entry Sheet" else "✍️ Interaktiewe Inskrywingsrooster",
+                                                color = LssGold,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 15.sp
+                                            )
+                                            Text(
+                                                text = if (isEnglish) "No CSV needed! Enter athletes and tick checkboxes." else "Geen CSV nodig nie! Tik atlete in en merk blokkies.",
+                                                color = LssTextMuted,
+                                                fontSize = 11.sp
+                                            )
+                                        }
+                                    }
+
+                                    Button(
+                                        onClick = { showDigitalSheetDialog = true },
+                                        colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader)
+                                    ) {
+                                        Icon(Icons.Default.Place, contentDescription = null, modifier = Modifier.size(15.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(if (isEnglish) "Full Screen" else "Volskerm", fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                // Quick Defaults Row (School for all, Paste names)
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    OutlinedTextField(
+                                        value = digitalDefaultSchool,
+                                        onValueChange = { digitalDefaultSchool = it },
+                                        label = { Text(if (isEnglish) "School for All" else "Skool vir Almal", fontSize = 10.sp) },
+                                        modifier = Modifier.weight(1.3f),
+                                        colors = OutlinedTextFieldDefaults.colors(
+                                            focusedBorderColor = LssGold,
+                                            unfocusedBorderColor = LssNavyCardLight
+                                        )
+                                    )
+                                    Button(
+                                        onClick = {
+                                            if (digitalDefaultSchool.isNotBlank()) {
+                                                digitalRows = digitalRows.map { it.copy(school = digitalDefaultSchool) }
+                                                statusMessage = if (isEnglish) "Applied '$digitalDefaultSchool' to all rows." else "'$digitalDefaultSchool' toegepas op alle rye."
+                                            }
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = LssNavyCardLight, contentColor = LssGold),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Text(if (isEnglish) "Apply All" else "Pas Almal Toe", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                    OutlinedButton(
+                                        onClick = { showQuickNamePasteDialog = true },
+                                        border = BorderStroke(1.dp, LssGold),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(14.dp), tint = LssGold)
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(if (isEnglish) "Paste Names" else "Plak Name", fontSize = 10.sp, color = LssGold)
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                // Horizontally scrollable table
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .border(1.dp, LssNavyCardLight, RoundedCornerShape(8.dp))
+                                        .horizontalScroll(rememberScrollState())
+                                ) {
+                                    Column(modifier = Modifier.padding(8.dp)) {
+                                        // Header Row
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier
+                                                .background(LssNavyHeader, RoundedCornerShape(4.dp))
+                                                .padding(vertical = 8.dp)
+                                        ) {
+                                            Text("#", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(30.dp))
+                                            Text(if (isEnglish) "First Name" else "Voornaam", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(110.dp))
+                                            Text(if (isEnglish) "Surname" else "Van", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(110.dp))
+                                            Text(if (isEnglish) "School" else "Skool", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(120.dp))
+                                            Text(if (isEnglish) "Gender" else "Geslag", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(75.dp))
+                                            Text(if (isEnglish) "Age" else "Oud", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(55.dp))
+
+                                            // Event Columns Headers
+                                            AppConstants.ENTRY_SHEET_DISCIPLINES.forEach { disc ->
+                                                val disp = when (disc) {
+                                                    "4x100m Relay" -> "4x100m"
+                                                    "Long Jump" -> "Verspring"
+                                                    "High Jump" -> "Hoogspring"
+                                                    "Shot Put" -> "Gewigstoot"
+                                                    "Discus" -> "Skyfwerp"
+                                                    "Javelin" -> "Spiesgooi"
+                                                    "70m Hurdles" -> "70mH"
+                                                    "75m Hurdles" -> "75mH"
+                                                    "80m Hurdles" -> "80mH"
+                                                    "150m Hurdles" -> "150mH"
+                                                    "200m Hurdles" -> "200mH"
+                                                    "1500m Walk" -> "1500m S"
+                                                    else -> disc
+                                                }
+                                                val isTrack = disc in AppConstants.TRACK_EVENTS
+                                                val isField = disc in AppConstants.FIELD_EVENTS
+                                                val isHurdle = disc in AppConstants.HURDLE_EVENTS
+                                                val headerColor = if (isTrack) LssGold else if (isField) androidx.compose.ui.graphics.Color(0xFF60A5FA) else if (isHurdle) androidx.compose.ui.graphics.Color(0xFFC084FC) else androidx.compose.ui.graphics.Color(0xFF34D399)
+
+                                                Box(
+                                                    modifier = Modifier.width(62.dp),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Text(
+                                                        text = disp,
+                                                        color = headerColor,
+                                                        fontSize = 10.sp,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
+                                            }
+
+                                            Spacer(modifier = Modifier.width(40.dp))
+                                        }
+
+                                        Spacer(modifier = Modifier.height(4.dp))
+
+                                        // Athlete Rows
+                                        digitalRows.forEachIndexed { index, row ->
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(vertical = 4.dp)
+                                            ) {
+                                                Text("${index + 1}", color = LssTextMuted, fontSize = 11.sp, modifier = Modifier.width(30.dp))
+
+                                                OutlinedTextField(
+                                                    value = row.firstName,
+                                                    onValueChange = { newVal ->
+                                                        digitalRows = digitalRows.mapIndexed { i, r -> if (i == index) r.copy(firstName = newVal) else r }
+                                                    },
+                                                    modifier = Modifier.width(105.dp),
+                                                    placeholder = { Text("Naam", fontSize = 10.sp) },
+                                                    singleLine = true,
+                                                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LssGold)
+                                                )
+                                                Spacer(modifier = Modifier.width(5.dp))
+
+                                                OutlinedTextField(
+                                                    value = row.lastName,
+                                                    onValueChange = { newVal ->
+                                                        digitalRows = digitalRows.mapIndexed { i, r -> if (i == index) r.copy(lastName = newVal) else r }
+                                                    },
+                                                    modifier = Modifier.width(105.dp),
+                                                    placeholder = { Text("Van", fontSize = 10.sp) },
+                                                    singleLine = true,
+                                                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LssGold)
+                                                )
+                                                Spacer(modifier = Modifier.width(5.dp))
+
+                                                OutlinedTextField(
+                                                    value = row.school,
+                                                    onValueChange = { newVal ->
+                                                        digitalRows = digitalRows.mapIndexed { i, r -> if (i == index) r.copy(school = newVal) else r }
+                                                    },
+                                                    modifier = Modifier.width(115.dp),
+                                                    singleLine = true,
+                                                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LssGold)
+                                                )
+                                                Spacer(modifier = Modifier.width(5.dp))
+
+                                                // Gender toggle chip
+                                                Surface(
+                                                    shape = RoundedCornerShape(6.dp),
+                                                    color = if (row.gender == "Seuns") LssNavyHeader else LssGold.copy(alpha = 0.2f),
+                                                    border = BorderStroke(1.dp, LssGold.copy(alpha = 0.5f)),
+                                                    modifier = Modifier
+                                                        .width(70.dp)
+                                                        .clickable {
+                                                            val nextG = if (row.gender == "Seuns") "Dogters" else "Seuns"
+                                                            digitalRows = digitalRows.mapIndexed { i, r -> if (i == index) r.copy(gender = nextG) else r }
+                                                        }
+                                                ) {
+                                                    Text(
+                                                        text = if (row.gender == "Seuns") (if (isEnglish) "Boys" else "Seuns") else (if (isEnglish) "Girls" else "Dogters"),
+                                                        color = LssGold,
+                                                        fontSize = 10.sp,
+                                                        fontWeight = FontWeight.Bold,
+                                                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp),
+                                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.width(5.dp))
+
+                                                // Age toggle
+                                                Surface(
+                                                    shape = RoundedCornerShape(6.dp),
+                                                    color = LssNavyHeader,
+                                                    border = BorderStroke(1.dp, LssGold.copy(alpha = 0.5f)),
+                                                    modifier = Modifier
+                                                        .width(50.dp)
+                                                        .clickable {
+                                                            val curAge = row.ageGroup.toIntOrNull() ?: 13
+                                                            val nextAge = if (curAge >= 13) 7 else curAge + 1
+                                                            digitalRows = digitalRows.mapIndexed { i, r -> if (i == index) r.copy(ageGroup = nextAge.toString()) else r }
+                                                        }
+                                                ) {
+                                                    Text(
+                                                        text = "o/${row.ageGroup}",
+                                                        color = LssTextLight,
+                                                        fontSize = 11.sp,
+                                                        fontWeight = FontWeight.Bold,
+                                                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp),
+                                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.width(5.dp))
+
+                                                // Event Checkboxes
+                                                AppConstants.ENTRY_SHEET_DISCIPLINES.forEach { disc ->
+                                                    val isChecked = row.events.contains(disc)
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .width(62.dp)
+                                                            .background(if (isChecked) LssGold.copy(alpha = 0.18f) else androidx.compose.ui.graphics.Color.Transparent)
+                                                            .clickable {
+                                                                val updatedEvents = row.events.toMutableSet()
+                                                                if (isChecked) updatedEvents.remove(disc) else updatedEvents.add(disc)
+                                                                digitalRows = digitalRows.mapIndexed { i, r -> if (i == index) r.copy(events = updatedEvents) else r }
+                                                            },
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Checkbox(
+                                                            checked = isChecked,
+                                                            onCheckedChange = { checked ->
+                                                                val updatedEvents = row.events.toMutableSet()
+                                                                if (checked) updatedEvents.add(disc) else updatedEvents.remove(disc)
+                                                                digitalRows = digitalRows.mapIndexed { i, r -> if (i == index) r.copy(events = updatedEvents) else r }
+                                                            },
+                                                            colors = CheckboxDefaults.colors(
+                                                                checkedColor = LssGold,
+                                                                checkmarkColor = LssNavyHeader,
+                                                                uncheckedColor = LssTextMuted
+                                                            )
+                                                        )
+                                                    }
+                                                }
+
+                                                // Delete row button
+                                                IconButton(
+                                                    onClick = {
+                                                        if (digitalRows.size > 1) {
+                                                            digitalRows = digitalRows.filterIndexed { i, _ -> i != index }
+                                                        } else {
+                                                            digitalRows = listOf(DigitalAthleteRow(school = digitalDefaultSchool))
+                                                        }
+                                                    },
+                                                    modifier = Modifier.size(36.dp)
+                                                ) {
+                                                    Icon(Icons.Default.Delete, contentDescription = "Skrap", tint = LssRedError, modifier = Modifier.size(16.dp))
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                // Bottom Row within Card
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Button(
+                                        onClick = {
+                                            digitalRows = digitalRows + DigitalAthleteRow(school = digitalDefaultSchool, gender = "Seuns", ageGroup = "13")
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = LssNavyCardLight, contentColor = LssGold)
+                                    ) {
+                                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(if (isEnglish) "Add Athlete Row" else "Voeg Atleet Ry By", fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                                    }
+
+                                    val totalCheckedItems = digitalRows.sumOf { it.events.size }
+                                    Text(
+                                        text = "${digitalRows.size} ${if (isEnglish) "athletes" else "atlete"} • $totalCheckedItems items",
+                                        color = LssGold,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+
+                                    Button(
+                                        onClick = {
+                                            val validAthletes = digitalRows.filter { it.firstName.isNotBlank() && it.lastName.isNotBlank() }
+                                            if (validAthletes.isNotEmpty()) {
+                                                val toSave = validAthletes.map { r ->
+                                                    Athlete(
+                                                        id = "",
+                                                        firstName = r.firstName.trim(),
+                                                        lastName = r.lastName.trim(),
+                                                        school = r.school.trim().ifBlank { digitalDefaultSchool },
+                                                        gender = r.gender,
+                                                        ageGroup = r.ageGroup,
+                                                        events = r.events.toList().ifEmpty { listOf("100m") }
+                                                    )
+                                                }
+                                                AthleticsRepository.bulkAddAthletes(toSave) { count ->
+                                                    statusMessage = if (isEnglish) "$count athletes saved to database!" else "$count atlete suksesvol in databasis gestoor!"
+                                                }
+                                                statusMessage = if (isEnglish) "${toSave.size} athletes saved!" else "${toSave.size} atlete suksesvol gestoor!"
+                                                selectedTab = 0
+                                            } else {
+                                                statusMessage = if (isEnglish) "Fill in First Name and Surname for at least one athlete." else "Vul asseblief Voornaam en Van in vir ten minste een atleet."
+                                            }
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader)
+                                    ) {
+                                        Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(if (isEnglish) "Save All to Meet" else "Stoor na Byeenkoms", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // CARD 1b: EXCEL SPREADSHEET TEMPLATES & EXPORT (FOR SCHOOLS WHO STILL WANT PAPER/CSV)
                     item {
                         Card(
                             colors = CardDefaults.cardColors(containerColor = LssNavyCard),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.Person, contentDescription = null, tint = LssGold)
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = if (isEnglish) "1. School Athlete Entry Spreadsheets (Image 1)" else "1. Atlete Inskrywingsdokument vir Skole (Image 1)",
-                                        color = LssGold,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 15.sp
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(6.dp))
+                            Column(modifier = Modifier.padding(14.dp)) {
+                                Text(
+                                    text = if (isEnglish) "📥 Blank Templates & CSV Export (Optional)" else "📥 Leë Sjablone & CSV Uitvoer (Opsioneel)",
+                                    color = LssGold,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = if (isEnglish)
-                                        "Matches your official Inskrywingsdokument: Teachers enter Age, First Name, Last Name, School, and tick their events with an 'x' at the top. Once received, upload the CSV here to register all athletes and their events automatically."
+                                        "Share printable/fillable blank spreadsheets to other schools, or export all currently registered athletes to a CSV spreadsheet file."
                                     else
-                                        "Stem ooreen met jou amptelike Inskrywingsdokument: Onderwysers tik Ouderdom, Voornaam, Van, Skool in en merk die items met 'n 'x' bo-aan. Laai die voltooide CSV hier op om alle atlete en hul items outomaties te registreer.",
+                                        "Deel leë Excel-sjablone aan ander skole, of voer alle tans geregistreerde atlete uit na 'n CSV-lêer.",
                                     color = LssTextMuted,
-                                    fontSize = 12.sp
+                                    fontSize = 11.sp
                                 )
-
                                 Spacer(modifier = Modifier.height(10.dp))
-                                Text(
-                                    text = if (isEnglish) "Share Blank Spreadsheet Templates to Schools:" else "Deel Leë Sigblad-Sjablone aan Skole:",
-                                    color = LssTextLight,
-                                    fontWeight = FontWeight.SemiBold,
-                                    fontSize = 12.sp
-                                )
-                                Spacer(modifier = Modifier.height(6.dp))
-
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -590,16 +1046,12 @@ fun SetupImportScreen(
                                     Button(
                                         onClick = {
                                             val template = CsvManager.generateAthleteMatrixTemplateCsv("Seuns")
-                                            CsvManager.shareContent(
-                                                context = context,
-                                                title = "Swartland_Inskrywingsdokument_Seuns.csv",
-                                                content = template
-                                            )
+                                            CsvManager.shareContent(context = context, title = "Swartland_Inskrywingsdokument_Seuns.csv", content = template)
                                         },
                                         modifier = Modifier.weight(1f),
                                         colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader)
                                     ) {
-                                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(15.dp))
+                                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(14.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Text(if (isEnglish) "Boys Template" else "Seuns Sjabloon", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                     }
@@ -607,16 +1059,12 @@ fun SetupImportScreen(
                                     Button(
                                         onClick = {
                                             val template = CsvManager.generateAthleteMatrixTemplateCsv("Dogters")
-                                            CsvManager.shareContent(
-                                                context = context,
-                                                title = "Swartland_Inskrywingsdokument_Dogters.csv",
-                                                content = template
-                                            )
+                                            CsvManager.shareContent(context = context, title = "Swartland_Inskrywingsdokument_Dogters.csv", content = template)
                                         },
                                         modifier = Modifier.weight(1f),
                                         colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader)
                                     ) {
-                                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(15.dp))
+                                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(14.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Text(if (isEnglish) "Girls Template" else "Dogters Sjabloon", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                     }
@@ -625,94 +1073,16 @@ fun SetupImportScreen(
                                 Spacer(modifier = Modifier.height(6.dp))
                                 OutlinedButton(
                                     onClick = {
-                                        val template = CsvManager.generateCombinedAthleteMatrixTemplateCsv()
-                                        CsvManager.shareContent(
-                                            context = context,
-                                            title = "Swartland_Inskrywingsdokument_Gekombineerd.csv",
-                                            content = template
-                                        )
-                                    },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = LssGold)
-                                ) {
-                                    Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(15.dp))
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text(if (isEnglish) "Combined Template (Boys & Girls)" else "Gekombineerde Sjabloon (Seuns & Dogters)", fontSize = 11.sp)
-                                }
-
-                                Spacer(modifier = Modifier.height(12.dp))
-                                HorizontalDivider(color = LssNavyCardLight)
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                // Gender fallback selector for import
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Text(
-                                        text = if (isEnglish) "Default gender if not specified:" else "Verstek geslag indien onvermeld:",
-                                        color = LssTextMuted,
-                                        fontSize = 11.sp
-                                    )
-                                    listOf("Seuns", "Dogters").forEach { g ->
-                                        FilterChip(
-                                            selected = importDefaultGender == g,
-                                            onClick = { importDefaultGender = g },
-                                            label = { Text(g, fontSize = 10.sp) },
-                                            modifier = Modifier.height(28.dp)
-                                        )
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Button(
-                                        onClick = {
-                                            currentFilePickerMode = "athletes"
-                                            filePickerLauncher.launch("*/*")
-                                        },
-                                        modifier = Modifier.weight(1f),
-                                        colors = ButtonDefaults.buttonColors(containerColor = LssGreenSuccess, contentColor = LssNavyHeader)
-                                    ) {
-                                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text(if (isEnglish) "Import Athletes CSV" else "Voer Atlete CSV In", fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                                    }
-
-                                    OutlinedButton(
-                                        onClick = {
-                                            pasteDialogType = "athletes"
-                                            showPasteDialog = true
-                                        },
-                                        modifier = Modifier.weight(1f),
-                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = LssGold)
-                                    ) {
-                                        Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp))
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text(if (isEnglish) "Paste Athletes" else "Plak Atlete Teks", fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-                                OutlinedButton(
-                                    onClick = {
                                         val csvData = CsvManager.exportAthletesToMatrixCsv(athletes)
-                                        CsvManager.shareContent(
-                                            context = context,
-                                            title = "Swartland_Geregistreerde_Atlete_Matriks.csv",
-                                            content = csvData
-                                        )
+                                        CsvManager.shareContent(context = context, title = "Swartland_Geregistreerde_Atlete_Matriks.csv", content = csvData)
                                     },
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = ButtonDefaults.outlinedButtonColors(contentColor = LssTextLight)
                                 ) {
-                                    Icon(Icons.Default.List, contentDescription = null, modifier = Modifier.size(15.dp))
+                                    Icon(Icons.Default.List, contentDescription = null, modifier = Modifier.size(14.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = if (isEnglish) "Export Registered Athletes (${athletes.size}) to Matrix CSV" else "Voer Huidige Atlete (${athletes.size}) Uit na Matriks-CSV",
+                                        text = if (isEnglish) "Export Registered Athletes (${athletes.size}) to CSV" else "Voer Huidige Atlete (${athletes.size}) Uit na CSV",
                                         fontSize = 11.sp
                                     )
                                 }
@@ -1348,6 +1718,457 @@ fun SetupImportScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showPasteDialog = false }) {
+                    Text(if (isEnglish) "Cancel" else "Kanselleer", color = LssTextMuted)
+                }
+            },
+            containerColor = LssNavyCard
+        )
+    }
+
+    // ==================== FULL SCREEN DIGITAL ENTRY SHEET DIALOG (POP-UP WINDOW) ====================
+    if (showDigitalSheetDialog) {
+        Dialog(
+            onDismissRequest = { showDigitalSheetDialog = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                shape = RoundedCornerShape(14.dp),
+                color = LssNavyDark,
+                border = BorderStroke(2.dp, LssGold)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(14.dp)
+                ) {
+                    // Header
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .background(LssGold, RoundedCornerShape(8.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Default.Edit, contentDescription = null, tint = LssNavyHeader, modifier = Modifier.size(22.dp))
+                            }
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Column {
+                                Text(
+                                    text = if (isEnglish) "✍️ Interactive Athlete Entry Sheet" else "✍️ Interaktiewe Inskrywingsrooster",
+                                    color = LssGold,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 17.sp
+                                )
+                                Text(
+                                    text = if (isEnglish)
+                                        "Tick checkboxes under each event. Add more athletes with one tap!"
+                                    else
+                                        "Merk blokkies onder elke item met 'n regmerkie. Geen CSV nodig nie!",
+                                    color = LssTextMuted,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+
+                        IconButton(onClick = { showDigitalSheetDialog = false }) {
+                            Icon(Icons.Default.Close, contentDescription = "Maak toe", tint = LssGold)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Toolbar (School for all, Paste names, Add athlete)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedTextField(
+                            value = digitalDefaultSchool,
+                            onValueChange = { digitalDefaultSchool = it },
+                            label = { Text(if (isEnglish) "School for All" else "Skool vir Almal", fontSize = 10.sp) },
+                            modifier = Modifier.weight(1.2f),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = LssGold,
+                                unfocusedBorderColor = LssNavyCardLight
+                            )
+                        )
+                        Button(
+                            onClick = {
+                                if (digitalDefaultSchool.isNotBlank()) {
+                                    digitalRows = digitalRows.map { it.copy(school = digitalDefaultSchool) }
+                                    statusMessage = if (isEnglish) "Applied '$digitalDefaultSchool' to all rows." else "'$digitalDefaultSchool' toegepas op alle rye."
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = LssNavyCardLight, contentColor = LssGold),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(if (isEnglish) "Apply All" else "Pas Almal Toe", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        }
+                        OutlinedButton(
+                            onClick = { showQuickNamePasteDialog = true },
+                            border = BorderStroke(1.dp, LssGold),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(14.dp), tint = LssGold)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(if (isEnglish) "Paste Names" else "Plak Name", fontSize = 10.sp, color = LssGold)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Scrollable Table (Takes flexible weight)
+                    val dlgHScroll = rememberScrollState()
+                    val dlgVScroll = rememberScrollState()
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .border(1.dp, LssNavyCardLight, RoundedCornerShape(8.dp))
+                            .horizontalScroll(dlgHScroll)
+                            .verticalScroll(dlgVScroll)
+                    ) {
+                        Column(modifier = Modifier.padding(8.dp)) {
+                            // Header Row
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .background(LssNavyHeader, RoundedCornerShape(4.dp))
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                Text("#", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(30.dp))
+                                Text(if (isEnglish) "First Name" else "Voornaam", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(110.dp))
+                                Text(if (isEnglish) "Surname" else "Van", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(110.dp))
+                                Text(if (isEnglish) "School" else "Skool", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(120.dp))
+                                Text(if (isEnglish) "Gender" else "Geslag", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(75.dp))
+                                Text(if (isEnglish) "Age" else "Oud", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 11.sp, modifier = Modifier.width(55.dp))
+
+                                // Event Columns Headers
+                                AppConstants.ENTRY_SHEET_DISCIPLINES.forEach { disc ->
+                                    val disp = when (disc) {
+                                        "4x100m Relay" -> "4x100m"
+                                        "Long Jump" -> "Verspring"
+                                        "High Jump" -> "Hoogspring"
+                                        "Shot Put" -> "Gewigstoot"
+                                        "Discus" -> "Skyfwerp"
+                                        "Javelin" -> "Spiesgooi"
+                                        "70m Hurdles" -> "70mH"
+                                        "75m Hurdles" -> "75mH"
+                                        "80m Hurdles" -> "80mH"
+                                        "150m Hurdles" -> "150mH"
+                                        "200m Hurdles" -> "200mH"
+                                        "1500m Walk" -> "1500m S"
+                                        else -> disc
+                                    }
+                                    val isTrack = disc in AppConstants.TRACK_EVENTS
+                                    val isField = disc in AppConstants.FIELD_EVENTS
+                                    val isHurdle = disc in AppConstants.HURDLE_EVENTS
+                                    val headerColor = if (isTrack) LssGold else if (isField) androidx.compose.ui.graphics.Color(0xFF60A5FA) else if (isHurdle) androidx.compose.ui.graphics.Color(0xFFC084FC) else androidx.compose.ui.graphics.Color(0xFF34D399)
+
+                                    Box(
+                                        modifier = Modifier.width(62.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = disp,
+                                            color = headerColor,
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.width(40.dp))
+                            }
+
+                            Spacer(modifier = Modifier.height(4.dp))
+
+                            digitalRows.forEachIndexed { index, row ->
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp)
+                                ) {
+                                    Text("${index + 1}", color = LssTextMuted, fontSize = 11.sp, modifier = Modifier.width(30.dp))
+
+                                    OutlinedTextField(
+                                        value = row.firstName,
+                                        onValueChange = { newVal ->
+                                            digitalRows = digitalRows.mapIndexed { i, r -> if (i == index) r.copy(firstName = newVal) else r }
+                                        },
+                                        modifier = Modifier.width(105.dp),
+                                        placeholder = { Text("Naam", fontSize = 10.sp) },
+                                        singleLine = true,
+                                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LssGold)
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+
+                                    OutlinedTextField(
+                                        value = row.lastName,
+                                        onValueChange = { newVal ->
+                                            digitalRows = digitalRows.mapIndexed { i, r -> if (i == index) r.copy(lastName = newVal) else r }
+                                        },
+                                        modifier = Modifier.width(105.dp),
+                                        placeholder = { Text("Van", fontSize = 10.sp) },
+                                        singleLine = true,
+                                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LssGold)
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+
+                                    OutlinedTextField(
+                                        value = row.school,
+                                        onValueChange = { newVal ->
+                                            digitalRows = digitalRows.mapIndexed { i, r -> if (i == index) r.copy(school = newVal) else r }
+                                        },
+                                        modifier = Modifier.width(115.dp),
+                                        singleLine = true,
+                                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = LssGold)
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+
+                                    // Gender toggle chip
+                                    Surface(
+                                        shape = RoundedCornerShape(6.dp),
+                                        color = if (row.gender == "Seuns") LssNavyHeader else LssGold.copy(alpha = 0.2f),
+                                        border = BorderStroke(1.dp, LssGold.copy(alpha = 0.5f)),
+                                        modifier = Modifier
+                                            .width(70.dp)
+                                            .clickable {
+                                                val nextG = if (row.gender == "Seuns") "Dogters" else "Seuns"
+                                                digitalRows = digitalRows.mapIndexed { i, r -> if (i == index) r.copy(gender = nextG) else r }
+                                            }
+                                    ) {
+                                        Text(
+                                            text = if (row.gender == "Seuns") (if (isEnglish) "Boys" else "Seuns") else (if (isEnglish) "Girls" else "Dogters"),
+                                            color = LssGold,
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp),
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(5.dp))
+
+                                    // Age toggle
+                                    Surface(
+                                        shape = RoundedCornerShape(6.dp),
+                                        color = LssNavyHeader,
+                                        border = BorderStroke(1.dp, LssGold.copy(alpha = 0.5f)),
+                                        modifier = Modifier
+                                            .width(50.dp)
+                                            .clickable {
+                                                val curAge = row.ageGroup.toIntOrNull() ?: 13
+                                                val nextAge = if (curAge >= 13) 7 else curAge + 1
+                                                digitalRows = digitalRows.mapIndexed { i, r -> if (i == index) r.copy(ageGroup = nextAge.toString()) else r }
+                                            }
+                                    ) {
+                                        Text(
+                                            text = "o/${row.ageGroup}",
+                                            color = LssTextLight,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp),
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(5.dp))
+
+                                    // Event Checkboxes
+                                    AppConstants.ENTRY_SHEET_DISCIPLINES.forEach { disc ->
+                                        val isChecked = row.events.contains(disc)
+                                        Box(
+                                            modifier = Modifier
+                                                .width(62.dp)
+                                                .background(if (isChecked) LssGold.copy(alpha = 0.18f) else androidx.compose.ui.graphics.Color.Transparent)
+                                                .clickable {
+                                                    val updatedEvents = row.events.toMutableSet()
+                                                    if (isChecked) updatedEvents.remove(disc) else updatedEvents.add(disc)
+                                                    digitalRows = digitalRows.mapIndexed { i, r -> if (i == index) r.copy(events = updatedEvents) else r }
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Checkbox(
+                                                checked = isChecked,
+                                                onCheckedChange = { checked ->
+                                                    val updatedEvents = row.events.toMutableSet()
+                                                    if (checked) updatedEvents.add(disc) else updatedEvents.remove(disc)
+                                                    digitalRows = digitalRows.mapIndexed { i, r -> if (i == index) r.copy(events = updatedEvents) else r }
+                                                },
+                                                colors = CheckboxDefaults.colors(
+                                                    checkedColor = LssGold,
+                                                    checkmarkColor = LssNavyHeader,
+                                                    uncheckedColor = LssTextMuted
+                                                )
+                                            )
+                                        }
+                                    }
+
+                                    // Delete row button
+                                    IconButton(
+                                        onClick = {
+                                            if (digitalRows.size > 1) {
+                                                digitalRows = digitalRows.filterIndexed { i, _ -> i != index }
+                                            } else {
+                                                digitalRows = listOf(DigitalAthleteRow(school = digitalDefaultSchool))
+                                            }
+                                        },
+                                        modifier = Modifier.size(36.dp)
+                                    ) {
+                                        Icon(Icons.Default.Delete, contentDescription = "Skrap", tint = LssRedError, modifier = Modifier.size(16.dp))
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Dialog Bottom Action Bar
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Button(
+                            onClick = {
+                                digitalRows = digitalRows + DigitalAthleteRow(school = digitalDefaultSchool, gender = "Seuns", ageGroup = "13")
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = LssNavyCardLight, contentColor = LssGold)
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(if (isEnglish) "Add Athlete Row" else "Voeg Atleet Ry By", fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                        }
+
+                        val totalCheckedItems = digitalRows.sumOf { it.events.size }
+                        Text(
+                            text = "${digitalRows.size} ${if (isEnglish) "athletes" else "atlete"} • $totalCheckedItems items",
+                            color = LssGold,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            TextButton(onClick = { showDigitalSheetDialog = false }) {
+                                Text(if (isEnglish) "Close" else "Maak Toe", color = LssTextMuted)
+                            }
+
+                            Button(
+                                onClick = {
+                                    val validAthletes = digitalRows.filter { it.firstName.isNotBlank() && it.lastName.isNotBlank() }
+                                    if (validAthletes.isNotEmpty()) {
+                                        val toSave = validAthletes.map { r ->
+                                            Athlete(
+                                                id = "",
+                                                firstName = r.firstName.trim(),
+                                                lastName = r.lastName.trim(),
+                                                school = r.school.trim().ifBlank { digitalDefaultSchool },
+                                                gender = r.gender,
+                                                ageGroup = r.ageGroup,
+                                                events = r.events.toList().ifEmpty { listOf("100m") }
+                                            )
+                                        }
+                                        AthleticsRepository.bulkAddAthletes(toSave) { count ->
+                                            statusMessage = if (isEnglish) "$count athletes saved to database!" else "$count atlete suksesvol in databasis gestoor!"
+                                        }
+                                        statusMessage = if (isEnglish) "${toSave.size} athletes saved to database!" else "${toSave.size} atlete suksesvol gestoor!"
+                                        showDigitalSheetDialog = false
+                                        selectedTab = 0
+                                    } else {
+                                        statusMessage = if (isEnglish) "Fill in First Name and Surname for at least one athlete." else "Vul asseblief Voornaam en Van in vir ten minste een atleet."
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader)
+                            ) {
+                                Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(if (isEnglish) "Save All to Meet" else "Stoor na Byeenkoms", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // ==================== QUICK NAME PASTE HELPER DIALOG ====================
+    if (showQuickNamePasteDialog) {
+        AlertDialog(
+            onDismissRequest = { showQuickNamePasteDialog = false },
+            title = {
+                Text(
+                    text = if (isEnglish) "📋 Quick Paste Athlete Names" else "📋 Plak Lys van Atleetname",
+                    color = LssGold,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = if (isEnglish)
+                            "Paste names from Word or Excel (one per line, e.g. 'Pieter Smit'). Rows will be created automatically:"
+                        else
+                            "Plak name uit Word of Excel (een per ry, bv. 'Pieter Smit'). Rye sal outomaties geskep word:",
+                        color = LssTextMuted,
+                        fontSize = 12.sp
+                    )
+                    OutlinedTextField(
+                        value = quickNamePasteContent,
+                        onValueChange = { quickNamePasteContent = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp),
+                        placeholder = {
+                            Text("Pieter Smit\nJohan Botha\nAnri Louw\nKarel Visser", fontSize = 12.sp)
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = LssGold,
+                            unfocusedBorderColor = LssNavyCardLight
+                        )
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val lines = quickNamePasteContent.split("\n").map { it.trim() }.filter { it.isNotBlank() }
+                        if (lines.isNotEmpty()) {
+                            val newRows = lines.map { line ->
+                                val parts = line.split("\\s+".toRegex())
+                                val fn = parts.firstOrNull() ?: ""
+                                val ln = parts.drop(1).joinToString(" ")
+                                DigitalAthleteRow(
+                                    firstName = fn,
+                                    lastName = ln,
+                                    school = digitalDefaultSchool,
+                                    gender = "Seuns",
+                                    ageGroup = "13",
+                                    events = mutableSetOf()
+                                )
+                            }
+                            digitalRows = digitalRows + newRows
+                            quickNamePasteContent = ""
+                            showQuickNamePasteDialog = false
+                            statusMessage = if (isEnglish) "${lines.size} athlete rows added! Now tick their events." else "${lines.size} atlete bygevoeg! Merk nou hul items."
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader)
+                ) {
+                    Text(if (isEnglish) "Add Rows" else "Voeg Rye By", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showQuickNamePasteDialog = false }) {
                     Text(if (isEnglish) "Cancel" else "Kanselleer", color = LssTextMuted)
                 }
             },

@@ -440,6 +440,59 @@ fun EventDashboardScreen(
                 }
             }
 
+            // 1c. DIGITAL ENTRY SHEET QUICK ACTION CARD (NO CSV NEEDED)
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onNavigateTo("setup_import") }
+                        .testTag("btn_dashboard_digital_sheet"),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = CardDefaults.cardColors(containerColor = LssNavyCard),
+                    border = BorderStroke(1.5.dp, LssGold)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(if (isCompact) 12.dp else 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .background(LssGold, CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = null,
+                                tint = LssNavyHeader,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = if (language == AppLanguage.ENGLISH)
+                                    "✍️ Enter Athletes (Interactive Digital Sheet)"
+                                else
+                                    "✍️ Skryf Atlete In (Digitale Sigblad)",
+                                color = LssGold,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = sectionTitleSize
+                            )
+                            Text(
+                                text = if (language == AppLanguage.ENGLISH)
+                                    "No CSV needed! Enter athletes and tick checkboxes under each event."
+                                else
+                                    "Geen CSV nodig nie! Tik atlete in en merk blokkies onder elke item.",
+                                color = LssTextLight,
+                                fontSize = captionSize
+                            )
+                        }
+                        Icon(Icons.Default.ArrowForward, contentDescription = null, tint = LssGold)
+                    }
+                }
+            }
+
             if (role == UserRole.SPECTATOR) {
                 item {
                     Surface(
