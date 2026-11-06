@@ -504,13 +504,28 @@ fun RecordsScreen(
                                 ) {
                                     Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(15.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text(if (isEnglish) "Clear Entire Records List" else "Wis Alle Rekords Uit", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    Text(if (isEnglish) "Clear Records" else "Wis Rekords Uit", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
                     }
                 }
             }
+        }
+
+        // Mandatory Footer: Created by Konrad Toerien
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp, top = 4.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Created by Konrad Toerien",
+                color = LssTextMuted,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 

@@ -433,8 +433,7 @@ fun ProgramScreen(
                                     color = LssTextMuted,
                                     fontSize = 12.sp
                                 )
-                                Spacer(modifier = Modifier.height(12.dp))
-
+                                Spacer(modifier = Modifier.height(10.dp))
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -451,9 +450,9 @@ fun ProgramScreen(
                                         modifier = Modifier.weight(1f),
                                         colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader)
                                     ) {
-                                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(15.dp))
+                                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(14.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Text(if (isEnglish) "Program Template" else "Program Sjabloon", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                        Text(if (isEnglish) "Template" else "Sjabloon", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                     }
 
                                     Button(
@@ -468,7 +467,7 @@ fun ProgramScreen(
                                         modifier = Modifier.weight(1f),
                                         colors = ButtonDefaults.buttonColors(containerColor = LssNavyHeader, contentColor = LssGold)
                                     ) {
-                                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(15.dp))
+                                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(14.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Text(if (isEnglish) "Export (${program.size})" else "Voer Uit (${program.size})", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                     }
@@ -484,9 +483,9 @@ fun ProgramScreen(
                                         modifier = Modifier.weight(1f),
                                         colors = ButtonDefaults.buttonColors(containerColor = LssGreenSuccess, contentColor = LssNavyHeader)
                                     ) {
-                                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(15.dp))
+                                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(14.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Text(if (isEnglish) "Import Program CSV" else "Voer Program CSV In", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                        Text(if (isEnglish) "Import CSV" else "Voer CSV In", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                     }
 
                                     OutlinedButton(
@@ -494,10 +493,58 @@ fun ProgramScreen(
                                         modifier = Modifier.weight(1f),
                                         colors = ButtonDefaults.outlinedButtonColors(contentColor = LssGold)
                                     ) {
-                                        Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(15.dp))
+                                        Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(14.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Text(if (isEnglish) "Paste Text" else "Plak Teks", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                     }
+                                }
+
+                                Spacer(modifier = Modifier.height(10.dp))
+                                // Quick Auto Program Generator Button
+                                Button(
+                                    onClick = {
+                                        val generatedItems = mutableListOf<ProgramItem>()
+                                        var itemIndex = 1
+                                        var currentHour = 8
+                                        var currentMin = 0
+
+                                        AppConstants.AGE_GROUPS.forEach { age ->
+                                            AppConstants.GENDERS.forEach { gender ->
+                                                val events = AppConstants.getEventsForAgeAndGender(age, gender)
+                                                events.take(4).forEach { ev ->
+                                                    val timeStr = String.format("%02d:%02d", currentHour, currentMin)
+                                                    val venue = if (AppConstants.isTrackEvent(ev)) "Hoofbaan" else "Veld 1"
+                                                    generatedItems.add(
+                                                        ProgramItem(
+                                                            itemNo = itemIndex++,
+                                                            startTime = timeStr,
+                                                            ageGroup = age,
+                                                            gender = gender,
+                                                            eventName = ev,
+                                                            venue = venue,
+                                                            status = "Wagtend"
+                                                        )
+                                                    )
+                                                    currentMin += 10
+                                                    if (currentMin >= 60) {
+                                                        currentHour += 1
+                                                        currentMin = 0
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        AthleticsRepository.bulkAddProgram(generatedItems) { count ->
+                                            message = if (isEnglish) "$count items auto-generated into program!" else "$count items outomaties in program gegenereer!"
+                                            selectedTab = 0
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader)
+                                ) {
+                                    Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(15.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(if (isEnglish) "⚡ Auto-Generate Program" else "⚡ Genereer Program Outomaties", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                 }
 
                                 Spacer(modifier = Modifier.height(12.dp))
@@ -514,13 +561,28 @@ fun ProgramScreen(
                                 ) {
                                     Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(15.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text(if (isEnglish) "Clear Entire Program" else "Wis Alle Program Items Uit", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    Text(if (isEnglish) "Clear Program" else "Wis Program Uit", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
                     }
                 }
             }
+        }
+
+        // Mandatory Footer: Created by Konrad Toerien
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp, top = 4.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Created by Konrad Toerien",
+                color = LssTextMuted,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 

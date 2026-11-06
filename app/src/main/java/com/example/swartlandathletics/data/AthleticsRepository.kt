@@ -504,4 +504,198 @@ object AthleticsRepository {
             }
         }
     }
+
+    // Meet Template Backup & Restore (Program & Records for New Meets / Next Year)
+    fun exportMeetTemplateJson(meetName: String, meetDate: String): String {
+        val root = org.json.JSONObject()
+        root.put("meetName", meetName.ifBlank { "Laerskool Swartland Atletiek" })
+        root.put("meetDate", meetDate.ifBlank { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date()) })
+        root.put("exportedAt", System.currentTimeMillis())
+        root.put("version", 1)
+
+        val progArray = org.json.JSONArray()
+        _program.value.forEach { item ->
+            val obj = org.json.JSONObject()
+            obj.put("itemNo", item.itemNo)
+            obj.put("startTime", item.startTime)
+            obj.put("ageGroup", item.ageGroup)
+            obj.put("gender", item.gender)
+            obj.put("eventName", item.eventName)
+            obj.put("venue", item.venue)
+            obj.put("status", "Wagtend")
+            progArray.put(obj)
+        }
+        root.put("program", progArray)
+
+        val recArray = org.json.JSONArray()
+        _records.value.forEach { rec ->
+            val obj = org.json.JSONObject()
+            obj.put("eventName", rec.eventName)
+            obj.put("ageGroup", rec.ageGroup)
+            obj.put("gender", rec.gender)
+            obj.put("recordValue", rec.recordValue)
+            obj.put("holder", rec.holder)
+            obj.put("year", rec.year)
+            recArray.put(obj)
+        }
+        root.put("records", recArray)
+
+        return root.toString(2)
+    }
+
+    fun importMeetTemplateJson(
+        jsonString: String,
+        clearExistingProgram: Boolean = true,
+        clearExistingRecords: Boolean = true,
+        onComplete: ((Boolean, String) -> Unit)? = null
+    ) {
+        val firestore = db ?: run {
+            onComplete?.invoke(false, "Firestore nie gereed nie")
+            return
+        }
+        val uid = currentUid()
+
+        try {
+            val root = org.json.JSONObject(jsonString)
+            val meetName = root.optString("meetName", "Byeenkoms")
+            val meetDate = root.optString("meetDate", "")
+            val progArray = root.optJSONArray("program") ?: org.json.JSONArray()
+            val recArray = root.optJSONArray("records") ?: org.json.JSONArray()
+
+            val progItems = mutableListOf<ProgramItem>()
+            for (i in 0 until progArray.length()) {
+                val obj = progArray.getJSONObject(i)
+                progItems.add(
+                    ProgramItem(
+                        itemNo = obj.optInt("itemNo", i + 1),
+                        startTime = obj.optString("startTime", "08:00"),
+                        ageGroup = obj.optString("ageGroup", "13"),
+                        gender = obj.optString("gender", "Seuns"),
+                        eventName = obj.optString("eventName", "100m"),
+                        venue = obj.optString("venue", "Hoofbaan"),
+                        status = "Wagtend"
+                    )
+                )
+            }
+
+            val recordItems = mutableListOf<EventRecord>()
+            for (i in 0 until recArray.length()) {
+                val obj = recArray.getJSONObject(i)
+                recordItems.add(
+                    EventRecord(
+                        eventName = obj.optString("eventName", "100m"),
+                        ageGroup = obj.optString("ageGroup", "13"),
+                        gender = obj.optString("gender", "Seuns"),
+                        recordValue = obj.optString("recordValue", "-"),
+                        holder = obj.optString("holder", "-"),
+                        year = obj.optInt("year", 2024)
+                    )
+                )
+            }
+
+            scope.launch {
+                try {
+                    if (clearExistingProgram) {
+                        val pSnap = com.google.android.gms.tasks.Tasks.await(firestore.collection("program").get())
+                        val batchP = firestore.batch()
+                        pSnap.documents.forEach { batchP.delete(it.reference) }
+                        com.google.android.gms.tasks.Tasks.await(batchP.commit())
+                    }
+                    if (clearExistingRecords) {
+                        val rSnap = com.google.android.gms.tasks.Tasks.await(firestore.collection("records").get())
+                        val batchR = firestore.batch()
+                        rSnap.documents.forEach { batchR.delete(it.reference) }
+                        com.google.android.gms.tasks.Tasks.await(batchR.commit())
+                    }
+
+                    progItems.chunked(400).forEach { chunk ->
+                        val batch = firestore.batch()
+                        chunk.forEach { p ->
+                            val docRef = firestore.collection("program").document()
+                            batch.set(
+                                docRef, mapOf(
+                                    "itemNo" to p.itemNo,
+                                    "startTime" to p.startTime,
+                                    "ageGroup" to p.ageGroup,
+                                    "gender" to p.gender,
+                                    "eventName" to p.eventName,
+                                    "venue" to p.venue,
+                                    "status" to "Wagtend",
+                                    "userId" to uid,
+                                    "createdAt" to FieldValue.serverTimestamp(),
+                                    "updatedAt" to FieldValue.serverTimestamp()
+                                )
+                            )
+                        }
+                        com.google.android.gms.tasks.Tasks.await(batch.commit())
+                    }
+
+                    recordItems.chunked(400).forEach { chunk ->
+                        val batch = firestore.batch()
+                        chunk.forEach { r ->
+                            val docRef = firestore.collection("records").document()
+                            batch.set(
+                                docRef, mapOf(
+                                    "eventName" to r.eventName,
+                                    "ageGroup" to r.ageGroup,
+                                    "gender" to r.gender,
+                                    "recordValue" to r.recordValue,
+                                    "holder" to r.holder,
+                                    "year" to r.year,
+                                    "userId" to uid,
+                                    "createdAt" to FieldValue.serverTimestamp()
+                                )
+                            )
+                        }
+                        com.google.android.gms.tasks.Tasks.await(batch.commit())
+                    }
+
+                    onComplete?.invoke(true, "Byeenkoms \"$meetName\" ($meetDate) herstel met ${progItems.size} program items en ${recordItems.size} rekords!")
+                } catch (e: Exception) {
+                    onComplete?.invoke(false, "Fout met stoor na Firestore: ${e.localizedMessage}")
+                }
+            }
+        } catch (e: Exception) {
+            onComplete?.invoke(false, "Fout met ontleding van lêer: ${e.localizedMessage}")
+        }
+    }
+
+    fun resetMeetForNewYear(
+        clearAthletes: Boolean = true,
+        resetProgramStatus: Boolean = true,
+        clearResults: Boolean = true,
+        onComplete: (() -> Unit)? = null
+    ) {
+        val firestore = db ?: return
+        scope.launch {
+            try {
+                if (clearAthletes) {
+                    val snap = com.google.android.gms.tasks.Tasks.await(firestore.collection("athletes").get())
+                    val b = firestore.batch()
+                    snap.documents.forEach { b.delete(it.reference) }
+                    com.google.android.gms.tasks.Tasks.await(b.commit())
+                }
+                if (clearResults) {
+                    val snap = com.google.android.gms.tasks.Tasks.await(firestore.collection("results").get())
+                    val b = firestore.batch()
+                    snap.documents.forEach { b.delete(it.reference) }
+                    com.google.android.gms.tasks.Tasks.await(b.commit())
+                }
+                if (resetProgramStatus) {
+                    val snap = com.google.android.gms.tasks.Tasks.await(firestore.collection("program").get())
+                    snap.documents.chunked(400).forEach { chunk ->
+                        val b = firestore.batch()
+                        chunk.forEach { doc ->
+                            b.update(doc.reference, "status", "Wagtend", "updatedAt", FieldValue.serverTimestamp())
+                        }
+                        com.google.android.gms.tasks.Tasks.await(b.commit())
+                    }
+                }
+                onComplete?.invoke()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in resetMeetForNewYear", e)
+                onComplete?.invoke()
+            }
+        }
+    }
 }

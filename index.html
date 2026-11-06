@@ -1141,7 +1141,7 @@
               <!-- Category Header Row -->
               <tr>
                 <th colspan="6" class="th-grp-info" data-i18n="grpAthleteDetails">1. Atleet Besonderhede</th>
-                <th colspan="9" class="th-grp-track">🏃 Hardloop (Track)</th>
+                <th colspan="11" class="th-grp-track">🏃 Hardloop (Track)</th>
                 <th colspan="5" class="th-grp-field">🎯 Velditems (Field)</th>
                 <th colspan="5" class="th-grp-hurdles">🚧 Hekkies</th>
                 <th colspan="1" class="th-grp-walk">🚶 Stap</th>
@@ -1196,6 +1196,21 @@
           <div style="display: flex; gap: 8px;">
             <button class="btn-secondary" onclick="addDigitalSheetRow()">➕ <span data-i18n="btnAddRow">Voeg Atleet By</span></button>
             <button class="btn-primary" onclick="saveAllDigitalSheetEntries()">💾 <span data-i18n="btnSaveAllEntries">Stoor & Registreer na Byeenkoms</span></button>
+          </div>
+        </div>
+
+        
+        <!-- Meet Backup & New Year Options -->
+        <div style="background: rgba(7, 18, 36, 0.7); border: 1.5px solid var(--lss-gold); border-radius: 10px; padding: 14px; margin-top: 18px;">
+          <h4 style="color: var(--lss-gold); font-size: 14px; margin-bottom: 4px;">💾 Byeenkoms Sjabloon & Nuwe Byeenkoms</h4>
+          <p style="font-size: 12px; color: var(--lss-text-muted); margin-bottom: 10px;">
+            Stoor die huidige program en rekords na 'n sjabloon-lêer vir volgende jaar, of gee 'n nuwe byeenkoms 'n vars begin sonder om die tydrooster oor te tik.
+          </p>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn-primary" style="font-size: 12px; padding: 7px 12px;" onclick="exportMeetTemplate()">💾 Stoor Sjabloon</button>
+            <button class="btn-primary" style="font-size: 12px; padding: 7px 12px;" onclick="openImportTemplateModal()">📂 Laai Sjabloon</button>
+            <button class="btn-secondary" style="font-size: 12px; padding: 7px 12px; border-color: var(--lss-gold); color: var(--lss-gold);" onclick="autoGenerateMeetProgram()">⚡ Genereer Program</button>
+            <button class="btn-secondary" style="font-size: 12px; padding: 7px 12px; border-color: #EF4444; color: #EF4444;" onclick="resetMeetForNewYear()">🔄 Nuwe Byeenkoms</button>
           </div>
         </div>
 
@@ -1324,6 +1339,10 @@
     </div>
   </footer>
 
+  <footer style="text-align: center; padding: 14px 10px; font-size: 11px; color: var(--lss-text-muted); background: var(--lss-navy-header); border-top: 1px solid var(--lss-border); margin-top: 24px;">
+    Created by Konrad Toerien
+  </footer>
+
   <!-- PIN Entry Modal for Officials -->
   <div class="modal-overlay" id="pinModal">
     <div class="modal-card">
@@ -1396,7 +1415,7 @@
           <thead>
             <tr>
               <th colspan="6" class="th-grp-info" data-i18n="grpAthleteDetails">1. Atleet Besonderhede</th>
-              <th colspan="9" class="th-grp-track">🏃 Hardloop (Track)</th>
+              <th colspan="11" class="th-grp-track">🏃 Hardloop (Track)</th>
               <th colspan="5" class="th-grp-field">🎯 Velditems (Field)</th>
               <th colspan="5" class="th-grp-hurdles">🚧 Hekkies</th>
               <th colspan="1" class="th-grp-walk">🚶 Stap</th>
@@ -1416,8 +1435,10 @@
               <th class="th-sub">100m</th>
               <th class="th-sub">150m</th>
               <th class="th-sub">200m</th>
+              <th class="th-sub">600m</th>
               <th class="th-sub">1200m</th>
               <th class="th-sub">1500m</th>
+              <th class="th-sub">4x50m</th>
               <th class="th-sub">4x100m</th>
               <!-- Field -->
               <th class="th-sub">Verspring</th>
@@ -1497,9 +1518,200 @@
 
   <script>
     
+    
+    // ==========================================
+    // 4. MEET BACKUP TEMPLATE & NEW YEAR RESET
+    // ==========================================
+    function exportMeetTemplate() {
+      const meetData = {
+        meetName: "Laerskool Swartland Atletiek",
+        meetDate: new Date().toISOString().split("T")[0],
+        exportedAt: new Date().toISOString(),
+        version: 1,
+        program: programData.map(p => ({
+          itemNo: p.itemNo || 1,
+          startTime: p.startTime || "08:00",
+          ageGroup: p.ageGroup || "13",
+          gender: p.gender || "Seuns",
+          eventName: p.eventName || "100m",
+          venue: p.venue || "Hoofbaan",
+          status: "Wagtend"
+        })),
+        records: recordsData.map(r => ({
+          eventName: r.eventName || "100m",
+          ageGroup: r.ageGroup || "13",
+          gender: r.gender || "Seuns",
+          recordValue: r.recordValue || "-",
+          holder: r.holder || "-",
+          year: r.year || 2024
+        }))
+      };
+
+      const str = JSON.stringify(meetData, null, 2);
+      const blob = new Blob([str], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Swartland_Atletiek_Sjabloon_${meetData.meetDate}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      alert("💾 Byeenkoms sjabloon (program en rekords) suksesvol gestoor vir volgende jaar!");
+    }
+
+    function openImportTemplateModal() {
+      document.getElementById("modalImportTemplate").classList.add("active");
+    }
+
+    function closeImportTemplateModal() {
+      document.getElementById("modalImportTemplate").classList.remove("active");
+    }
+
+    async function processImportTemplateJson() {
+      const text = document.getElementById("templateJsonInput").value.trim();
+      if (!text) {
+        alert("Plak asseblief die sjabloon JSON teks of kies 'n lêer.");
+        return;
+      }
+
+      try {
+        const root = JSON.parse(text);
+        const progItems = root.program || [];
+        const recordItems = root.records || [];
+
+        if (progItems.length === 0 && recordItems.length === 0) {
+          alert("Geen geldige program of rekords in die sjabloon gevind nie.");
+          return;
+        }
+
+        const batch = db.batch();
+        
+        // Import program items
+        progItems.forEach((p, idx) => {
+          const ref = db.collection("program").doc("prog_tmp_" + Date.now() + "_" + idx);
+          batch.set(ref, {
+            itemNo: p.itemNo || (idx + 1),
+            startTime: p.startTime || "08:00",
+            ageGroup: p.ageGroup || "13",
+            gender: p.gender || "Seuns",
+            eventName: p.eventName || "100m",
+            venue: p.venue || "Hoofbaan",
+            status: "Wagtend",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        });
+
+        // Import record items
+        recordItems.forEach((r, idx) => {
+          const ref = db.collection("records").doc("rec_tmp_" + Date.now() + "_" + idx);
+          batch.set(ref, {
+            eventName: r.eventName || "100m",
+            ageGroup: r.ageGroup || "13",
+            gender: r.gender || "Seuns",
+            recordValue: r.recordValue || "-",
+            holder: r.holder || "-",
+            year: r.year || 2024,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        });
+
+        await batch.commit();
+        closeImportTemplateModal();
+        alert(`🎉 Byeenkoms sjabloon suksesvol gelaai! ${progItems.length} program items en ${recordItems.length} rekords geregistreer.`);
+      } catch (err) {
+        alert("Fout met laai van sjabloon: " + err.message);
+      }
+    }
+
+    async function resetMeetForNewYear() {
+      if (!confirm("Wil jy regtig die byeenkoms herstel vir 'n nuwe jaar? Dit verwyder alle atlete en uitslae, maar behou die program en rekords.")) {
+        return;
+      }
+
+      try {
+        const batch = db.batch();
+        
+        // Clear athletes
+        const athSnap = await db.collection("athletes").get();
+        athSnap.forEach(doc => batch.delete(doc.ref));
+
+        // Clear results
+        const resSnap = await db.collection("results").get();
+        resSnap.forEach(doc => batch.delete(doc.ref));
+
+        // Reset program statuses to Wagtend
+        const progSnap = await db.collection("program").get();
+        progSnap.forEach(doc => batch.update(doc.ref, { status: "Wagtend" }));
+
+        await batch.commit();
+        alert("🔄 Nuwe Byeenkoms gereed! Alle atlete en lewendige uitslae is skoongemaak. Die program en rekords is behou vir die nuwe byeenkoms.");
+      } catch (err) {
+        alert("Fout met nuwe byeenkoms herstel: " + err.message);
+      }
+    }
+
+    function autoGenerateMeetProgram() {
+      if (programData.length > 0) {
+        if (!confirm("Daar is reeds program-items op die tydrooster. Wil jy die outomatiese program byvoeg?")) {
+          return;
+        }
+      }
+
+      const ages = ["6", "7", "8", "9", "10", "11", "12", "13"];
+      const genders = ["Seuns", "Dogters"];
+      const generated = [];
+      let itemIdx = programData.length + 1;
+      let hour = 8;
+      let min = 0;
+
+      ages.forEach(age => {
+        genders.forEach(gender => {
+          let events = [];
+          if (age === "6") events = ["50m", "60m", "80m"];
+          else if (age === "7" || age === "8") events = ["60m", "80m", "Verspring"];
+          else if (age === "9") events = ["60m", "80m", "100m", "600m", "4x50m Aflos", "Verspring", "Hoogspring", "Gewigstoot"];
+          else events = ["100m", "200m", "600m", "1200m", "4x50m Aflos", "4x100m Aflos", "Verspring", "Hoogspring", "Gewigstoot"];
+
+          events.forEach(ev => {
+            const timeStr = (hour < 10 ? "0" + hour : hour) + ":" + (min < 10 ? "0" + min : min);
+            const venue = (ev.includes("m") && !ev.includes("Jump") && !ev.includes("spring")) ? "Hoofbaan" : "Veld 1";
+            generated.push({
+              itemNo: itemIdx++,
+              startTime: timeStr,
+              ageGroup: age,
+              gender: gender,
+              eventName: ev,
+              venue: venue,
+              status: "Wagtend"
+            });
+
+            min += 10;
+            if (min >= 60) {
+              hour += 1;
+              min = 0;
+            }
+          });
+        });
+      });
+
+      const batch = db.batch();
+      generated.forEach((p, idx) => {
+        const ref = db.collection("program").doc("prog_auto_" + Date.now() + "_" + idx);
+        batch.set(ref, {
+          ...p,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
+
+      batch.commit().then(() => {
+        alert(`⚡ ${generated.length} program items outomaties gegenereer en op die tydrooster geplaas!`);
+      }).catch(err => {
+        alert("Fout met generering: " + err.message);
+      });
+    }
+
     // 3. Digital Sheet Matrix State & Operations (Replacing CSV with Interactive Checkboxes)
     const DIGITAL_EVENTS = [
-      "50m", "60m", "80m", "100m", "150m", "200m", "1200m", "1500m", "4x100m",
+      "50m", "60m", "80m", "100m", "150m", "200m", "600m", "1200m", "1500m", "4x50m", "4x100m",
       "Verspring", "Hoogspring", "Gewigstoot", "Skyfwerp", "Spiesgooi",
       "70mH", "75mH", "80mH", "150mH", "200mH", "1500m Stap"
     ];
@@ -1765,17 +1977,17 @@
         tabBulk: "📂 CSV Massainvoer",
         tabOfficials: "⌨️ Beampte Tik-Portaal",
         tabPrint: "🖨️ Drukkerystelsel",
-        btnHeroEnterAthletes: "Skryf Atlete In (Digitale Sigblad - Merk Blokkie)",
+        btnHeroEnterAthletes: "✍️ Inskryf",
         btnHeroViewSheet: "Bekyk Sigblad Blad",
         tabDigitalSheet: "✍️ Digitale Sigblad",
         digitalSheetTitle: "✍️ Digitale Inskrywings Sigblad (Merk Blokkie)",
         digitalSheetSub: "Voer atlete in of plak name. Merk items eenvoudig met 'n regmerkie (☑️) in die tabel sonder enige CSV-lêers.",
         btnExpandModal: "Maak Oop in Groot Venster",
         lblDefaultSchool: "Verstek Skool:",
-        btnApplySchoolToAll: "Pas Skool Toe op Almal",
-        btnPasteNames: "Plak Name vanaf Lys / Knipbord",
-        btnAddRow: "Voeg Atleet-Ry By",
-        btnSaveAllEntries: "Stoor & Registreer na Byeenkoms",
+        btnApplySchoolToAll: "⚡ Pas Skool Toe",
+        btnPasteNames: "📋 Plak Name",
+        btnAddRow: "➕ Voeg Ry By",
+        btnSaveAllEntries: "💾 Stoor",
         grpAthleteDetails: "1. Atleet Besonderhede",
         modalDigitalTitle: "✍️ Digitale Inskrywings Sigblad (Merk Blokkie)",
         modalDigitalSub: "Tik atlete in of plak name. Merk items eenvoudig met 'n regmerkie (☑️) in die tabel sonder enige CSV-lêers.",
@@ -1882,17 +2094,17 @@
         tabBulk: "📂 Bulk CSV Import",
         tabOfficials: "⌨️ Official Entry Portal",
         tabPrint: "🖨️ Print Center",
-        btnHeroEnterAthletes: "Enter Athletes (Digital Sheet - Tick Boxes)",
+        btnHeroEnterAthletes: "✍️ Enter",
         btnHeroViewSheet: "View Digital Sheet",
         tabDigitalSheet: "✍️ Digital Sheet",
         digitalSheetTitle: "✍️ Digital Entry Sheet (Tick Boxes)",
         digitalSheetSub: "Enter athletes or paste names. Simply tick event boxes (☑️) in the table without any CSV files.",
         btnExpandModal: "Open in Full Window",
         lblDefaultSchool: "Default School:",
-        btnApplySchoolToAll: "Apply School to All",
-        btnPasteNames: "Paste Names from List / Clipboard",
-        btnAddRow: "Add Athlete Row",
-        btnSaveAllEntries: "Save & Register to Meet",
+        btnApplySchoolToAll: "⚡ Apply School",
+        btnPasteNames: "📋 Paste Names",
+        btnAddRow: "➕ Add Row",
+        btnSaveAllEntries: "💾 Save",
         grpAthleteDetails: "1. Athlete Details",
         modalDigitalTitle: "✍️ Digital Entry Sheet (Tick Boxes)",
         modalDigitalSub: "Enter athletes or paste names. Simply tick event boxes (☑️) in the table without any CSV files.",
@@ -2029,7 +2241,7 @@
     let pendingBulkAthletes = [];
 
     const ALL_AVAILABLE_EVENTS = [
-      "50m", "60m", "80m", "100m", "150m", "200m", "1200m", "1500m", "4x100m Aflos",
+      "50m", "60m", "80m", "100m", "150m", "200m", "600m", "1200m", "1500m", "4x50m Aflos", "4x100m Aflos",
       "Verspring", "Hoogspring", "Gewigstoot", "Skyfwerp", "Spiesgooi",
       "70m Hekkies", "75m Hekkies", "80m Hekkies", "150m Hekkies", "200m Hekkies", "1500m Stap"
     ];

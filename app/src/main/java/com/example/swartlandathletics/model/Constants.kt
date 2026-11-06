@@ -5,13 +5,13 @@ object AppConstants {
     val GENDERS = listOf("Seuns", "Dogters")
 
     val ALL_DISCIPLINES = listOf(
-        "50m", "60m", "80m", "100m", "150m", "200m",
-        "1200m", "1500m", "1500m Walk", "4x100m Relay",
+        "50m", "60m", "80m", "100m", "150m", "200m", "600m",
+        "1200m", "1500m", "1500m Walk", "4x50m Relay", "4x100m Relay",
         "70m Hurdles", "75m Hurdles", "80m Hurdles", "150m Hurdles", "200m Hurdles",
         "Long Jump", "High Jump", "Shot Put", "Discus", "Javelin"
     )
 
-    val TRACK_EVENTS = listOf("50m", "60m", "80m", "100m", "150m", "200m", "800m", "1200m", "1500m", "4x100m Relay")
+    val TRACK_EVENTS = listOf("50m", "60m", "80m", "100m", "150m", "200m", "600m", "800m", "1200m", "1500m", "4x50m Relay", "4x100m Relay")
     val FIELD_EVENTS = listOf("Long Jump", "High Jump", "Shot Put", "Discus", "Javelin")
     val HURDLE_EVENTS = listOf("70m Hurdles", "75m Hurdles", "80m Hurdles", "150m Hurdles", "200m Hurdles")
     val WALK_EVENTS = listOf("1500m Walk")
@@ -30,24 +30,31 @@ object AppConstants {
                 gender.trim().lowercase().startsWith("f")
 
         val events = mutableListOf<String>()
+        // 60m and 80m for all ages as requested
+        events.add("60m")
+        events.add("80m")
+
         when (age) {
-            "6" -> events.add("50m")
+            "6" -> {
+                events.add("50m")
+            }
             "7", "8" -> {
-                events.add("60m")
-                events.add("80m")
+                // 60m & 80m already added
             }
             "9" -> {
-                events.addAll(listOf("60m", "80m", "100m", "1200m", "Long Jump", "High Jump", "Shot Put"))
+                // Girls and Boys 9: 600m, 4x50m relay, Shot Put, Long Jump, High Jump
+                events.addAll(listOf("100m", "600m", "1200m", "4x50m Relay", "Long Jump", "High Jump", "Shot Put", "4x100m Relay"))
             }
             "10", "11" -> {
-                events.addAll(listOf("60m", "80m", "100m", "1200m", "70m Hurdles", "Long Jump", "High Jump", "Shot Put"))
+                // Girls and Boys 10-11: 600m, 4x50m relay, etc.
+                events.addAll(listOf("100m", "600m", "1200m", "4x50m Relay", "70m Hurdles", "Long Jump", "High Jump", "Shot Put", "4x100m Relay"))
             }
             "12" -> {
                 events.addAll(
                     listOf(
-                        "60m", "80m", "100m", "150m", "1200m",
+                        "100m", "150m", "600m", "1200m", "4x50m Relay",
                         "75m Hurdles", "150m Hurdles",
-                        "Long Jump", "High Jump", "Shot Put", "Discus", "Javelin", "1500m Walk"
+                        "Long Jump", "High Jump", "Shot Put", "Discus", "Javelin", "1500m Walk", "4x100m Relay"
                     )
                 )
             }
@@ -55,23 +62,22 @@ object AppConstants {
                 val hurdle = if (isGirls) "75m Hurdles" else "80m Hurdles"
                 events.addAll(
                     listOf(
-                        "80m", "100m", "200m", "1500m",
+                        "100m", "200m", "600m", "1500m", "4x50m Relay",
                         hurdle, "200m Hurdles",
-                        "Long Jump", "High Jump", "Shot Put", "Discus", "Javelin", "1500m Walk"
+                        "Long Jump", "High Jump", "Shot Put", "Discus", "Javelin", "1500m Walk", "4x100m Relay"
                     )
                 )
             }
-            else -> events.addAll(listOf("80m", "100m", "200m", "Long Jump", "Shot Put"))
+            else -> events.addAll(listOf("100m", "200m", "600m", "Long Jump", "Shot Put", "4x50m Relay", "4x100m Relay"))
         }
 
-        events.add("4x100m Relay")
-        return events
+        return events.distinct()
     }
 
-    // Exact order of events as on Laerskool Swartland Inskrywingsdokument (Image 1)
+    // Exact order of events as on Laerskool Swartland Inskrywingsdokument with additional requested events
     val ENTRY_SHEET_DISCIPLINES = listOf(
         // Track
-        "50m", "60m", "80m", "100m", "150m", "200m", "1200m", "1500m", "4x100m Relay",
+        "50m", "60m", "80m", "100m", "150m", "200m", "600m", "1200m", "1500m", "4x50m Relay", "4x100m Relay",
         // Field
         "Long Jump", "High Jump", "Shot Put", "Discus", "Javelin",
         // Hurdles
@@ -90,9 +96,11 @@ object AppConstants {
             lower == "100m" -> "100m"
             lower == "150m" -> "150m"
             lower == "200m" -> "200m"
+            lower == "600m" -> "600m"
             lower == "800m" -> "800m"
             lower == "1200m" -> "1200m"
             lower == "1500m" -> "1500m"
+            lower.contains("4x50") -> "4x50m Relay"
             lower.contains("relay") || lower.contains("aflos") || lower.contains("4x100") -> "4x100m Relay"
             lower.contains("verspring") || lower.contains("longjump") -> "Long Jump"
             lower.contains("hoogspring") || lower.contains("highjump") -> "High Jump"

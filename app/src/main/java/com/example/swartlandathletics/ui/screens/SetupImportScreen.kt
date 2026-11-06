@@ -144,6 +144,11 @@ fun SetupImportScreen(
                                 "Geen geldige rekords gevind nie. Verwagte kolomme: Item, Ouderdom, Geslag, Tyd of Afstand, Skool of Atleet, Jaar."
                         }
                     }
+                    "meet_template" -> {
+                        AthleticsRepository.importMeetTemplateJson(content) { success, msg ->
+                            statusMessage = msg
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 statusMessage = "Fout met lêerlees: ${e.localizedMessage}"
@@ -1294,7 +1299,7 @@ fun SetupImportScreen(
                         }
                     }
 
-                    // CARD 4: RESET & CLEANUP OPTIONS
+                    // CARD 4: MEET BACKUP & NEW YEAR RESET
                     item {
                         Card(
                             colors = CardDefaults.cardColors(containerColor = LssNavyCard),
@@ -1302,7 +1307,7 @@ fun SetupImportScreen(
                         ) {
                             Column(modifier = Modifier.padding(14.dp)) {
                                 Text(
-                                    text = if (isEnglish) "4. Reset Data & Start Anew" else "4. Vee Data Uit vir Nuwe Byeenkoms",
+                                    text = if (isEnglish) "4. Meet Backup & Next Year Setup" else "4. Byeenkoms Sjabloon & Nuwe Byeenkoms",
                                     color = LssGold,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 14.sp
@@ -1310,9 +1315,9 @@ fun SetupImportScreen(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = if (isEnglish)
-                                        "Permanently remove athletes, program, or records. The database stays 100% blank with zero auto-regeneration."
+                                        "Save program & records to a backup file for next year's event, upload a stored backup, or reset for a new meet."
                                     else
-                                        "Verwyder atlete, program of rekords permanent. Die databasis bly 100% skoon sonder dat enige voorbeelddata vanself terugkom.",
+                                        "Stoor program en rekords na 'n sjabloon-lêer vir volgende jaar, laai 'n gestoorde sjabloon in, of gee 'n nuwe byeenkoms 'n vars begin.",
                                     color = LssTextMuted,
                                     fontSize = 11.sp
                                 )
@@ -1324,28 +1329,33 @@ fun SetupImportScreen(
                                 ) {
                                     Button(
                                         onClick = {
-                                            AthleticsRepository.clearAllAthletes()
-                                            statusMessage = if (isEnglish) "All athletes cleared." else "Alle atlete verwyder uit databasis."
+                                            val jsonStr = AthleticsRepository.exportMeetTemplateJson(
+                                                meetName = "Laerskool Swartland Atletiek",
+                                                meetDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+                                            )
+                                            val fileName = "Swartland_Atletiek_Sjabloon_${java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())}.json"
+                                            CsvManager.shareContent(context = context, title = fileName, content = jsonStr)
+                                            statusMessage = if (isEnglish) "Meet backup template exported!" else "Byeenkoms sjabloon uitgevoer!"
                                         },
                                         modifier = Modifier.weight(1f),
-                                        colors = ButtonDefaults.buttonColors(containerColor = LssRedError.copy(alpha = 0.85f), contentColor = LssTextWhite)
+                                        colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader)
                                     ) {
-                                        Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(14.dp))
+                                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(14.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Text(if (isEnglish) "Clear Athletes" else "Wis Atlete Uit", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                        Text(if (isEnglish) "💾 Save Template" else "💾 Stoor Sjabloon", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                     }
 
                                     Button(
                                         onClick = {
-                                            AthleticsRepository.clearAllProgram()
-                                            statusMessage = if (isEnglish) "Program cleared." else "Program items verwyder."
+                                            currentFilePickerMode = "meet_template"
+                                            filePickerLauncher.launch("*/*")
                                         },
                                         modifier = Modifier.weight(1f),
-                                        colors = ButtonDefaults.buttonColors(containerColor = LssRedError.copy(alpha = 0.85f), contentColor = LssTextWhite)
+                                        colors = ButtonDefaults.buttonColors(containerColor = LssGreenSuccess, contentColor = LssNavyHeader)
                                     ) {
-                                        Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(14.dp))
+                                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(14.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Text(if (isEnglish) "Clear Program" else "Wis Program Uit", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                        Text(if (isEnglish) "📂 Load Template" else "📂 Laai Sjabloon", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
 
@@ -1356,15 +1366,20 @@ fun SetupImportScreen(
                                 ) {
                                     Button(
                                         onClick = {
-                                            AthleticsRepository.clearAllRecords()
-                                            statusMessage = if (isEnglish) "Records cleared." else "Rekords verwyder."
+                                            AthleticsRepository.resetMeetForNewYear(
+                                                clearAthletes = true,
+                                                resetProgramStatus = true,
+                                                clearResults = true
+                                            ) {
+                                                statusMessage = if (isEnglish) "Meet reset for new year! (Program & records kept)" else "Nuwe byeenkoms gereed! (Program & rekords behou)"
+                                            }
                                         },
                                         modifier = Modifier.weight(1f),
-                                        colors = ButtonDefaults.buttonColors(containerColor = LssRedError.copy(alpha = 0.85f), contentColor = LssTextWhite)
+                                        colors = ButtonDefaults.buttonColors(containerColor = LssGold.copy(alpha = 0.2f), contentColor = LssGold)
                                     ) {
-                                        Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(14.dp))
+                                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(14.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Text(if (isEnglish) "Clear Records" else "Wis Rekords Uit", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                        Text(if (isEnglish) "🔄 New Meet" else "🔄 Nuwe Byeenkoms", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                     }
 
                                     Button(
@@ -1377,28 +1392,29 @@ fun SetupImportScreen(
                                     ) {
                                         Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(14.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Text(if (isEnglish) "Reset All Data" else "Vee Alles Uit", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                        Text(if (isEnglish) "Clear All" else "Vee Alles Uit", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                     }
-                                }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-                                OutlinedButton(
-                                    onClick = {
-                                        AthleticsRepository.seedInitialData()
-                                        statusMessage = if (isEnglish) "Initial sample data loaded!" else "Byeenkomsdata herlaai!"
-                                    },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = LssGold)
-                                ) {
-                                    Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(15.dp))
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text(if (isEnglish) "Optional: Load Sample Data" else "Opsioneel: Herlaai Voorbeelddata", fontSize = 11.sp)
                                 }
                             }
                         }
                     }
                 }
             }
+        }
+
+        // Mandatory Footer: Created by Konrad Toerien
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp, top = 4.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Created by Konrad Toerien",
+                color = LssTextMuted,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 
