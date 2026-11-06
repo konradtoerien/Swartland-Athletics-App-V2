@@ -368,9 +368,9 @@ fun SignInScreen(
                 Column {
                     Text(
                         text = if (language == AppLanguage.ENGLISH)
-                            "Enter the 4-digit official access PIN (Default: 1920):"
+                            "Enter the 4-digit official access PIN:"
                         else
-                            "Voer die amptelike 4-syfer beampte PIN in (Verstek: 1920):",
+                            "Voer die amptelike 4-syfer beampte PIN in:",
                         color = LssTextLight,
                         fontSize = 13.sp
                     )
@@ -719,9 +719,9 @@ fun MainAppContent(
                 Column {
                     Text(
                         text = if (language == AppLanguage.ENGLISH)
-                            "Enter the 4-digit official access PIN to record results and manage entries (Default: 1920):"
+                            "Enter the 4-digit official access PIN to record results and manage entries:"
                         else
-                            "Voer die amptelike 4-syfer beampte PIN in om uitslae aan te teken en inskrywings te bestuur (Verstek: 1920):",
+                            "Voer die amptelike 4-syfer beampte PIN in om uitslae aan te teken en inskrywings te bestuur:",
                         color = LssTextLight,
                         fontSize = 13.sp
                     )

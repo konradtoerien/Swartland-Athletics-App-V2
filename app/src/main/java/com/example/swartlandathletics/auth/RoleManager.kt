@@ -15,7 +15,7 @@ object RoleManager {
     private const val PREFS_NAME = "swartland_role_prefs"
     private const val KEY_ROLE = "selected_user_role"
     private const val KEY_PIN = "official_access_pin"
-    private const val DEFAULT_PIN = "1920"
+    private const val DEFAULT_PIN = "7300"
 
     private var prefs: SharedPreferences? = null
 

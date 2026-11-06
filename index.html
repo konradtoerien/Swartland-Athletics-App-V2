@@ -809,8 +809,8 @@
     <button class="tab-btn" onclick="switchTab('ludorum')"><span data-i18n="tabLudorum">🌟 Victor & Victrix</span></button>
     <button class="tab-btn" onclick="switchTab('program')"><span data-i18n="tabProgram">📅 Program Rooster</span></button>
     <button class="tab-btn" onclick="switchTab('records')"><span data-i18n="tabRecords">📜 Rekords</span></button>
-    <button class="tab-btn" onclick="switchTab('entries')"><span data-i18n="tabEntries">📝 Aanlyn Inskrywings</span></button>
-    <button class="tab-btn" id="tabDigitalSheet" onclick="switchTab('digitalSheet')"><span data-i18n="tabDigitalSheet">✍️ Digitale Sigblad</span></button>
+    <button class="tab-btn official-only" id="tabEntriesNav" style="display: none;" onclick="switchTab('entries')"><span data-i18n="tabEntries">📝 Aanlyn Inskrywings</span></button>
+    <button class="tab-btn official-only" id="tabDigitalSheetNav" style="display: none;" onclick="switchTab('digitalSheet')"><span data-i18n="tabDigitalSheet">✍️ Digitale Sigblad</span></button>
     <button class="tab-btn official-only" id="tabOfficials" style="display: none;" onclick="switchTab('officials')"><span data-i18n="tabOfficials">⌨️ Beampte Tik-Portaal</span></button>
     <button class="tab-btn official-only" id="tabPrint" style="display: none;" onclick="switchTab('print')"><span data-i18n="tabPrint">🖨️ Drukkerystelsel</span></button>
   </nav>
@@ -1348,7 +1348,7 @@
     <div class="modal-card">
       <h3 style="color: var(--lss-gold); margin-bottom: 10px;" data-i18n="modalPinTitle">🔒 Beampte Aanmelding</h3>
       <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 16px;" data-i18n="modalPinSub">
-        Tik die amptelike 4-syfer PIN in om inskrywings te bestuur of uitslae in te voer (Verstek: 1920):
+        Tik die amptelike 4-syfer PIN in om inskrywings te bestuur of uitslae in te voer :
       </p>
       <input type="password" id="modalPinInput" class="form-control" placeholder="****" style="text-align: center; font-size: 20px; letter-spacing: 6px; margin-bottom: 16px;" maxlength="8">
       <div style="display: flex; gap: 10px; justify-content: center;">
@@ -1723,6 +1723,13 @@
     ];
 
     function openDigitalEntryModal() {
+      if (!isOfficial) {
+        alert(currentLang === "af" 
+          ? "🔒 Inskrywings is slegs vir gemagtigde beamptes. Voer asseblief die beampte PIN in." 
+          : "🔒 Athlete entries are restricted to authorized officials. Please enter the official PIN.");
+        openRoleModal();
+        return;
+      }
       document.getElementById("modalDigitalEntrySheet").classList.add("active");
       renderDigitalSheet();
     }
@@ -2069,7 +2076,7 @@
         btnPrintProgram: "Druk Program Rooster",
         btnPrintRecords: "Druk Rekordlys",
         modalPinTitle: "🔒 Beampte Aanmelding",
-        modalPinSub: "Tik die amptelike 4-syfer PIN in om inskrywings te bestuur of uitslae in te voer (Verstek: 1920):",
+        modalPinSub: "Tik die amptelike 4-syfer PIN in om inskrywings te bestuur of uitslae in te voer :",
         btnCancel: "Kanselleer",
         btnConfirmPin: "Bevestig PIN",
         pasteModalTitle: "📋 Plak direk vanaf Excel",
@@ -2186,7 +2193,7 @@
         btnPrintProgram: "Print Program Timetable",
         btnPrintRecords: "Print Records",
         modalPinTitle: "🔒 Official Login",
-        modalPinSub: "Enter the official 4-digit PIN to manage entries or record results (Default: 1920):",
+        modalPinSub: "Enter the official 4-digit PIN to manage entries or record results :",
         btnCancel: "Cancel",
         btnConfirmPin: "Confirm PIN",
         pasteModalTitle: "📋 Paste directly from Excel",
@@ -2508,6 +2515,13 @@
 
     // Tab Navigation
     function switchTab(tabId) {
+      if ((tabId === "entries" || tabId === "digitalSheet" || tabId === "bulk" || tabId === "officials") && !isOfficial) {
+        alert(currentLang === "af" 
+          ? "🔒 Hierdie afdeling is slegs beskikbaar vir gemagtigde beamptes met die PIN." 
+          : "🔒 This section is restricted to authorized officials with the PIN.");
+        openRoleModal();
+        return;
+      }
       document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
       document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
       
@@ -2546,13 +2560,13 @@
 
     function verifyOfficialPin() {
       const pin = document.getElementById("modalPinInput").value.trim();
-      if (pin === "1920" || pin.length >= 4) {
+      if (pin === "7300" || pin.length >= 4) {
         isOfficial = true;
         closeRoleModal();
         updateRoleUI();
         alert("✅ Beampte Modus suksesvol ontsluit! U het nou volle toegang.");
       } else {
-        alert("❌ Verkeerde PIN. Die amptelike verstek-PIN is 1920.");
+        alert("❌ Verkeerde PIN. Probeer asseblief weer.");
       }
     }
 
@@ -2561,6 +2575,8 @@
       const tabOfficials = document.getElementById("tabOfficials");
       const tabPrint = document.getElementById("tabPrint");
       const tabBulk = document.getElementById("tabBulk");
+      const tabEntriesNav = document.getElementById("tabEntriesNav");
+      const tabDigitalSheetNav = document.getElementById("tabDigitalSheetNav");
       const entriesLockNotice = document.getElementById("entriesLockNotice");
       const entriesFormContainer = document.getElementById("entriesFormContainer");
 
@@ -2571,6 +2587,8 @@
         if (tabOfficials) tabOfficials.style.display = "flex";
         if (tabPrint) tabPrint.style.display = "flex";
         if (tabBulk) tabBulk.style.display = "flex";
+        if (tabEntriesNav) tabEntriesNav.style.display = "flex";
+        if (tabDigitalSheetNav) tabDigitalSheetNav.style.display = "flex";
         if (entriesLockNotice) entriesLockNotice.style.display = "none";
         if (entriesFormContainer) entriesFormContainer.style.display = "block";
       } else {
@@ -2580,6 +2598,8 @@
         if (tabOfficials) tabOfficials.style.display = "none";
         if (tabPrint) tabPrint.style.display = "none";
         if (tabBulk) tabBulk.style.display = "none";
+        if (tabEntriesNav) tabEntriesNav.style.display = "none";
+        if (tabDigitalSheetNav) tabDigitalSheetNav.style.display = "none";
         if (entriesLockNotice) entriesLockNotice.style.display = "block";
         if (entriesFormContainer) entriesFormContainer.style.display = "none";
       }

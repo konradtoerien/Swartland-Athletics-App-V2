@@ -114,7 +114,7 @@ object L10n {
     fun roleSwitchToOfficial(l: AppLanguage) = if (l == AppLanguage.ENGLISH) "Switch to Official Mode" else "Skakel oor na Beampte Modus"
     fun roleSwitchToSpectator(l: AppLanguage) = if (l == AppLanguage.ENGLISH) "Lock to Spectator Mode" else "Sluit as Toeskouer Modus"
     fun roleEnterPinPrompt(l: AppLanguage) = if (l == AppLanguage.ENGLISH) "Enter Official 4-digit PIN:" else "Voer Beampte 4-syfer PIN in:"
-    fun rolePinIncorrect(l: AppLanguage) = if (l == AppLanguage.ENGLISH) "Incorrect PIN. Default is 1920." else "Verkeerde PIN. Verstek is 1920."
+    fun rolePinIncorrect(l: AppLanguage) = if (l == AppLanguage.ENGLISH) "Incorrect PIN. Please try again." else "Verkeerde PIN. Probeer asseblief weer."
     fun spectatorNotice(l: AppLanguage) = if (l == AppLanguage.ENGLISH) "👀 Spectator Mode: Live results are view-only. Organizers tap to unlock." else "👀 Toeskouer Modus: Uitslae is slegs-kyk. Beoordelaars tik om te ontsluit."
     fun shareWhatsAppLink(l: AppLanguage) = if (l == AppLanguage.ENGLISH) "Share Live Web Link (WhatsApp)" else "Deel Lewendige Web-Skakel (WhatsApp)"
     fun webDashboardDesc(l: AppLanguage) = if (l == AppLanguage.ENGLISH) "Anyone with this link (iPhone, Android, PC) can follow results live in any browser without editing permissions." else "Enigeen met hierdie skakel (iPhone, Android, PC) kan uitslae intyds in hul webblaaier volg sonder wysigingsregte."
