@@ -8,9 +8,9 @@ object WebDashboardConfig {
     private const val PREFS_NAME = "swartland_web_config"
     private const val KEY_CUSTOM_URL = "custom_web_url"
     
-    // Default GitHub Pages URL for the imported repository
-    const val DEFAULT_WEB_URL = "https://konradtoerien.github.io/swartland-athletics-app/"
-    const val GITHUB_SETTINGS_PAGES_URL = "https://github.com/konradtoerien/swartland-athletics-app/settings/pages"
+    // Default GitHub Pages URL for the renamed repository
+    const val DEFAULT_WEB_URL = "https://konradtoerien.github.io/Swartland-Athletics-App-V2/"
+    const val GITHUB_SETTINGS_PAGES_URL = "https://github.com/konradtoerien/Swartland-Athletics-App-V2/settings/pages"
 
     fun getWebUrl(context: Context): String {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
