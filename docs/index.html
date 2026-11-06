@@ -42,13 +42,14 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      padding-bottom: 70px; /* Space for sticky bottom utility bar */
     }
 
     /* Top Navigation Header */
     header {
       background: linear-gradient(180deg, var(--lss-navy-header) 0%, #0c1c38 100%);
       border-bottom: 2px solid var(--lss-gold);
-      padding: 12px 20px;
+      padding: 10px 16px;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -64,18 +65,14 @@
       gap: 12px;
     }
 
-    .header-logo {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--lss-navy-dark);
-      border: 2px solid var(--lss-gold);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      color: var(--lss-gold);
-      font-size: 16px;
+    .header-logo-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      object-fit: contain;
+      background: rgba(7, 18, 36, 0.5);
+      border: 1px solid var(--lss-gold);
+      padding: 2px;
     }
 
     .header-title h1 {
@@ -90,10 +87,10 @@
       color: var(--lss-text-muted);
     }
 
-    .header-actions {
+    .header-status-badge {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .live-pill {
@@ -123,30 +120,11 @@
       100% { opacity: 0.3; transform: scale(0.9); }
     }
 
-    .btn-official-toggle {
-      background: transparent;
-      border: 1px solid var(--lss-gold);
-      color: var(--lss-gold);
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-    }
-
-    .btn-official-toggle:hover {
-      background: rgba(244, 196, 48, 0.15);
-    }
-
     /* Hero & Progress Section */
     .hero-banner {
       background: var(--lss-navy-card);
       border-bottom: 1px solid var(--lss-border);
-      padding: 16px 20px;
+      padding: 14px 18px;
     }
 
     .hero-container {
@@ -155,10 +133,10 @@
     }
 
     .progress-bar-wrapper {
-      margin-top: 10px;
+      margin-top: 8px;
       background: #071324;
       border-radius: 8px;
-      height: 10px;
+      height: 9px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,0.06);
     }
@@ -172,9 +150,9 @@
 
     .hero-stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
       gap: 10px;
-      margin-top: 14px;
+      margin-top: 12px;
     }
 
     .stat-card {
@@ -186,7 +164,7 @@
     }
 
     .stat-val {
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 800;
       color: var(--lss-gold);
     }
@@ -206,13 +184,14 @@
       max-width: 1100px;
       margin: 0 auto;
       width: 100%;
+      scrollbar-width: thin;
     }
 
     .tab-btn {
       background: transparent;
       border: none;
       color: var(--lss-text-muted);
-      padding: 14px 18px;
+      padding: 12px 16px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
@@ -220,7 +199,7 @@
       border-bottom: 3px solid transparent;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       transition: all 0.2s;
     }
 
@@ -231,7 +210,7 @@
     .tab-btn.active {
       color: var(--lss-gold);
       border-bottom: 3px solid var(--lss-gold);
-      background: rgba(244, 196, 48, 0.05);
+      background: rgba(244, 196, 48, 0.06);
     }
 
     /* Main Container */
@@ -240,7 +219,7 @@
       max-width: 1100px;
       width: 100%;
       margin: 0 auto;
-      padding: 20px;
+      padding: 18px;
     }
 
     .view-section {
@@ -269,9 +248,11 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
-    /* Results Table */
+    /* Tables */
     .styled-table {
       width: 100%;
       border-collapse: collapse;
@@ -280,7 +261,7 @@
     }
 
     .styled-table th {
-      background: rgba(7, 18, 36, 0.8);
+      background: rgba(7, 18, 36, 0.85);
       color: var(--lss-gold);
       padding: 10px 12px;
       font-weight: 600;
@@ -323,7 +304,7 @@
       font-size: 11px;
     }
 
-    /* Form Inputs for Officials */
+    /* Form Controls */
     .form-group {
       margin-bottom: 14px;
     }
@@ -367,6 +348,9 @@
       cursor: pointer;
       font-size: 13px;
       transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .btn-primary:hover {
@@ -383,24 +367,120 @@
       font-size: 13px;
     }
 
-    /* WhatsApp Share Button */
-    .btn-whatsapp {
+    /* Item Selection Pills for Dropdown Checklist */
+    .events-pill-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      background: #071324;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--lss-border);
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .event-pill {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--lss-text-light);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .event-pill.selected {
+      background: var(--lss-gold);
+      color: var(--lss-navy-header);
+      font-weight: 700;
+      border-color: var(--lss-gold);
+    }
+
+    /* Sticky Bottom Utility Bar */
+    .bottom-utility-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(7, 18, 36, 0.95);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--lss-border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 99;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.4);
+    }
+
+    .bottom-bar-left, .bottom-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-lang-toggle {
+      background: #112240;
+      border: 1px solid var(--lss-gold);
+      color: var(--lss-gold);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-whatsapp-bottom {
       background: #25D366;
       color: #FFFFFF;
       font-weight: 700;
-      padding: 10px 16px;
+      padding: 7px 14px;
       border-radius: 8px;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
+      font-size: 12px;
       border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-whatsapp-bottom:hover {
+      background: #20BA56;
+    }
+
+    .btn-copy-bottom {
+      background: #112240;
+      color: var(--lss-text-light);
+      border: 1px solid var(--lss-border);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12px;
       cursor: pointer;
     }
 
-    .btn-whatsapp:hover {
-      background: #20BA56;
+    .btn-official-bottom {
+      background: transparent;
+      border: 1px solid var(--lss-gold);
+      color: var(--lss-gold);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     /* Print Styles */
@@ -408,8 +488,9 @@
       body {
         background: #ffffff !important;
         color: #000000 !important;
+        padding-bottom: 0 !important;
       }
-      header, .hero-banner, .tab-bar, .no-print, button, .btn-whatsapp {
+      header, .hero-banner, .tab-bar, .bottom-utility-bar, .no-print, button {
         display: none !important;
       }
       .section-card {
@@ -468,27 +549,40 @@
       width: 90%;
       text-align: center;
     }
+
+    /* Drag and Drop Box */
+    .drag-drop-zone {
+      border: 2px dashed var(--lss-gold);
+      background: rgba(7, 18, 36, 0.6);
+      border-radius: 10px;
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 16px;
+    }
+
+    .drag-drop-zone:hover {
+      background: rgba(244, 196, 48, 0.08);
+    }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation Header -->
+  <!-- Top Navigation Header with School Logo -->
   <header>
     <div class="header-branding">
-      <div class="header-logo">LS</div>
+      <img src="logo.png" alt="Laerskool Swartland" class="header-logo-img" onerror="this.style.display='none'">
       <div class="header-title">
-        <h1>Laerskool Swartland</h1>
-        <p>Amptelike Atletiek Byeenkoms Portaal</p>
+        <h1 data-i18n="appTitle">Laerskool Swartland</h1>
+        <p data-i18n="appSubtitle">Amptelike Atletiek Byeenkoms Portaal</p>
       </div>
     </div>
-    <div class="header-actions">
+    <div class="header-status-badge">
       <div class="live-pill">
         <span class="live-dot"></span>
-        <span>INTYDS</span>
+        <span data-i18n="liveBadge">INTYDS</span>
       </div>
-      <button class="btn-official-toggle no-print" id="roleBtn" onclick="toggleRoleModal()">
-        <span>🔒 Beampte Aanmelding</span>
-      </button>
     </div>
   </header>
 
@@ -497,9 +591,6 @@
     <div class="hero-container">
       <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
         <span style="color: var(--lss-text-muted);" id="progressLabel">Byeenkoms Vordering: 0 van 0 voltooi (0%)</span>
-        <button class="btn-whatsapp no-print" onclick="shareWhatsAppLink()">
-          <span>📲 Deel Skakel op WhatsApp</span>
-        </button>
       </div>
       <div class="progress-bar-wrapper">
         <div class="progress-bar-fill" id="progressBar"></div>
@@ -507,23 +598,23 @@
       <div class="hero-stats-grid">
         <div class="stat-card">
           <div class="stat-val" id="statAthletes">0</div>
-          <div class="stat-lbl">Atlete Ingeskryf</div>
+          <div class="stat-lbl" data-i18n="statAthletes">Atlete Ingeskryf</div>
         </div>
         <div class="stat-card">
           <div class="stat-val" id="statResults">0</div>
-          <div class="stat-lbl">Uitslae Voltooi</div>
+          <div class="stat-lbl" data-i18n="statResults">Uitslae Voltooi</div>
         </div>
         <div class="stat-card">
           <div class="stat-val" id="statSchools">0</div>
-          <div class="stat-lbl">Deelnemende Skole</div>
+          <div class="stat-lbl" data-i18n="statSchools">Deelnemende Skole</div>
         </div>
         <div class="stat-card">
           <div class="stat-val" id="statMedals">0</div>
-          <div class="stat-lbl">Medaljes Toegeken</div>
+          <div class="stat-lbl" data-i18n="statMedals">Medaljes Toegeken</div>
         </div>
         <div class="stat-card">
           <div class="stat-val" id="statRecords">0</div>
-          <div class="stat-lbl">Rekords</div>
+          <div class="stat-lbl" data-i18n="statRecords">Rekords</div>
         </div>
       </div>
     </div>
@@ -531,17 +622,18 @@
 
   <!-- Tab Bar Navigation -->
   <nav class="tab-bar no-print">
-    <button class="tab-btn active" onclick="switchTab('results')">⏱️ Lewendige Uitslae</button>
-    <button class="tab-btn" onclick="switchTab('standings')">🏆 Skole Ranglys</button>
-    <button class="tab-btn" onclick="switchTab('ludorum')">🌟 Victor & Victrix</button>
-    <button class="tab-btn" onclick="switchTab('program')">📅 Program Rooster</button>
-    <button class="tab-btn" onclick="switchTab('records')">📜 Rekords</button>
-    <button class="tab-btn official-only" id="tabOfficials" style="display: none;" onclick="switchTab('officials')">⌨️ Beampte Tik-Portaal</button>
-    <button class="tab-btn official-only" id="tabPrint" style="display: none;" onclick="switchTab('print')">🖨️ Drukkerystelsel</button>
-    <button class="tab-btn" onclick="switchTab('entries')">📝 Aanlyn Inskrywings</button>
+    <button class="tab-btn active" onclick="switchTab('results')"><span data-i18n="tabResults">⏱️ Lewendige Uitslae</span></button>
+    <button class="tab-btn" onclick="switchTab('standings')"><span data-i18n="tabStandings">🏆 Skole Ranglys</span></button>
+    <button class="tab-btn" onclick="switchTab('ludorum')"><span data-i18n="tabLudorum">🌟 Victor & Victrix</span></button>
+    <button class="tab-btn" onclick="switchTab('program')"><span data-i18n="tabProgram">📅 Program Rooster</span></button>
+    <button class="tab-btn" onclick="switchTab('records')"><span data-i18n="tabRecords">📜 Rekords</span></button>
+    <button class="tab-btn" onclick="switchTab('entries')"><span data-i18n="tabEntries">📝 Aanlyn Inskrywings</span></button>
+    <button class="tab-btn official-only" id="tabBulk" style="display: none;" onclick="switchTab('bulk')"><span data-i18n="tabBulk">📂 CSV Massainvoer</span></button>
+    <button class="tab-btn official-only" id="tabOfficials" style="display: none;" onclick="switchTab('officials')"><span data-i18n="tabOfficials">⌨️ Beampte Tik-Portaal</span></button>
+    <button class="tab-btn official-only" id="tabPrint" style="display: none;" onclick="switchTab('print')"><span data-i18n="tabPrint">🖨️ Drukkerystelsel</span></button>
   </nav>
 
-  <!-- Print Header for Physical Printouts -->
+  <!-- Print Header -->
   <div class="print-header">
     <h2>LAERSKOOL SWARTLAND - ATLETIEK BYEENKOMS</h2>
     <p>Amptelike Byeenkomsverslag en Uitslae</p>
@@ -554,26 +646,26 @@
     <div id="view-results" class="view-section active">
       <div class="section-card">
         <div class="card-title">
-          <span>⏱️ Jongste Uitslae (Lewendig op die Veld)</span>
-          <span style="font-size: 12px; color: var(--lss-text-muted);">Outomaties bygewerk via Firestore</span>
+          <span data-i18n="resultsTitle">⏱️ Jongste Uitslae (Lewendig op die Veld)</span>
+          <span style="font-size: 12px; color: var(--lss-text-muted);" data-i18n="resultsSub">Outomaties bygewerk via Firestore</span>
         </div>
         <div style="overflow-x: auto;">
           <table class="styled-table" id="tableResults">
             <thead>
               <tr>
-                <th>Plek</th>
-                <th>Item</th>
-                <th>Geslag</th>
-                <th>Oud.</th>
-                <th>Atleet</th>
-                <th>Skool</th>
-                <th>Tyd / Afstand</th>
-                <th>ASA Punte</th>
+                <th data-i18n="colPlace">Plek</th>
+                <th data-i18n="colItem">Item</th>
+                <th data-i18n="colGender">Geslag</th>
+                <th data-i18n="colAge">Oud.</th>
+                <th data-i18n="colAthlete">Atleet</th>
+                <th data-i18n="colSchool">Skool</th>
+                <th data-i18n="colResult">Tyd / Afstand</th>
+                <th data-i18n="colPoints">ASA Punte</th>
               </tr>
             </thead>
             <tbody id="tbodyResults">
               <tr>
-                <td colspan="8" style="text-align: center; color: var(--lss-text-muted); padding: 24px;">
+                <td colspan="8" style="text-align: center; color: var(--lss-text-muted); padding: 24px;" data-i18n="waitingResults">
                   Wag vir eerste amptelike uitslae van beoordelaars...
                 </td>
               </tr>
@@ -587,19 +679,19 @@
     <div id="view-standings" class="view-section">
       <div class="section-card">
         <div class="card-title">
-          <span>🏆 Skole Ranglys & Medaljetelling (Kampioenskool)</span>
+          <span data-i18n="standingsTitle">🏆 Skole Ranglys & Medaljetelling (Kampioenskool)</span>
         </div>
         <div style="overflow-x: auto;">
           <table class="styled-table" id="tableStandings">
             <thead>
               <tr>
-                <th>Rang</th>
-                <th>Skool</th>
-                <th>Goud 🥇</th>
-                <th>Silwer 🥈</th>
-                <th>Brons 🥉</th>
-                <th>Items</th>
-                <th>Totale Punte</th>
+                <th data-i18n="colRank">Rang</th>
+                <th data-i18n="colSchool">Skool</th>
+                <th data-i18n="colGold">Goud 🥇</th>
+                <th data-i18n="colSilver">Silwer 🥈</th>
+                <th data-i18n="colBronze">Brons 🥉</th>
+                <th data-i18n="colEvents">Items</th>
+                <th data-i18n="colTotalPoints">Totale Punte</th>
               </tr>
             </thead>
             <tbody id="tbodyStandings">
@@ -610,30 +702,50 @@
       </div>
     </div>
 
-    <!-- 3. VICTOR & VICTRIX LUDORUM -->
+    <!-- 3. VICTOR & VICTRIX LUDORUM (OVERALL, SENIOR, JUNIOR) -->
     <div id="view-ludorum" class="view-section">
       <div class="section-card">
         <div class="card-title">
-          <span>🌟 Victor & Victrix Ludorum Toekennings</span>
+          <span data-i18n="ludorumTitle">🌟 Victor & Victrix Ludorum Toekennings</span>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;">
-          <div style="background: rgba(7, 18, 36, 0.7); border: 1px solid var(--lss-gold); border-radius: 10px; padding: 16px;">
-            <div style="font-size: 13px; color: var(--lss-gold); font-weight: 700;">👑 Algehele Victor Ludorum</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+          <!-- Overall Victor -->
+          <div style="background: rgba(7, 18, 36, 0.7); border: 1.5px solid var(--lss-gold); border-radius: 10px; padding: 16px;">
+            <div style="font-size: 13px; color: var(--lss-gold); font-weight: 700;" data-i18n="ludorumOverallVictor">👑 Algehele Victor Ludorum</div>
             <div style="font-size: 18px; font-weight: 800; margin: 8px 0;" id="ludorumOverallVictor">Bereken tans...</div>
             <div style="font-size: 12px; color: var(--lss-text-muted);" id="ludorumOverallVictorSub">-</div>
           </div>
-          <div style="background: rgba(7, 18, 36, 0.7); border: 1px solid var(--lss-gold); border-radius: 10px; padding: 16px;">
-            <div style="font-size: 13px; color: var(--lss-gold); font-weight: 700;">👑 Algehele Victrix Ludorum</div>
+          <!-- Overall Victrix -->
+          <div style="background: rgba(7, 18, 36, 0.7); border: 1.5px solid var(--lss-gold); border-radius: 10px; padding: 16px;">
+            <div style="font-size: 13px; color: var(--lss-gold); font-weight: 700;" data-i18n="ludorumOverallVictrix">👑 Algehele Victrix Ludorum</div>
             <div style="font-size: 18px; font-weight: 800; margin: 8px 0;" id="ludorumOverallVictrix">Bereken tans...</div>
             <div style="font-size: 12px; color: var(--lss-text-muted);" id="ludorumOverallVictrixSub">-</div>
           </div>
+
+          <!-- Senior Victor (o/12 & o/13) -->
           <div style="background: rgba(7, 18, 36, 0.7); border: 1px solid var(--lss-border); border-radius: 10px; padding: 16px;">
-            <div style="font-size: 13px; color: var(--lss-gold); font-weight: 700;">🏅 Senior Victor (o/12 & o/13)</div>
-            <div style="font-size: 16px; font-weight: 700; margin: 6px 0;" id="ludorumSeniorVictor">-</div>
+            <div style="font-size: 13px; color: var(--lss-gold); font-weight: 700;" data-i18n="ludorumSeniorVictor">🏅 Senior Victor Ludorum (o/12 & o/13)</div>
+            <div style="font-size: 17px; font-weight: 800; margin: 6px 0;" id="ludorumSeniorVictor">-</div>
+            <div style="font-size: 12px; color: var(--lss-text-muted);" id="ludorumSeniorVictorSub">-</div>
           </div>
+          <!-- Senior Victrix (o/12 & o/13) -->
           <div style="background: rgba(7, 18, 36, 0.7); border: 1px solid var(--lss-border); border-radius: 10px; padding: 16px;">
-            <div style="font-size: 13px; color: var(--lss-gold); font-weight: 700;">🏅 Senior Victrix (o/12 & o/13)</div>
-            <div style="font-size: 16px; font-weight: 700; margin: 6px 0;" id="ludorumSeniorVictrix">-</div>
+            <div style="font-size: 13px; color: var(--lss-gold); font-weight: 700;" data-i18n="ludorumSeniorVictrix">🏅 Senior Victrix Ludorum (o/12 & o/13)</div>
+            <div style="font-size: 17px; font-weight: 800; margin: 6px 0;" id="ludorumSeniorVictrix">-</div>
+            <div style="font-size: 12px; color: var(--lss-text-muted);" id="ludorumSeniorVictrixSub">-</div>
+          </div>
+
+          <!-- JUNIOR VICTOR (o/7 - o/11) -->
+          <div style="background: rgba(7, 18, 36, 0.7); border: 1.5px solid #10B981; border-radius: 10px; padding: 16px;">
+            <div style="font-size: 13px; color: #10B981; font-weight: 700;" data-i18n="ludorumJuniorVictor">⭐ Junior Victor Ludorum (o/7 - o/11)</div>
+            <div style="font-size: 17px; font-weight: 800; margin: 6px 0;" id="ludorumJuniorVictor">-</div>
+            <div style="font-size: 12px; color: var(--lss-text-muted);" id="ludorumJuniorVictorSub">-</div>
+          </div>
+          <!-- JUNIOR VICTRIX (o/7 - o/11) -->
+          <div style="background: rgba(7, 18, 36, 0.7); border: 1.5px solid #10B981; border-radius: 10px; padding: 16px;">
+            <div style="font-size: 13px; color: #10B981; font-weight: 700;" data-i18n="ludorumJuniorVictrix">⭐ Junior Victrix Ludorum (o/7 - o/11)</div>
+            <div style="font-size: 17px; font-weight: 800; margin: 6px 0;" id="ludorumJuniorVictrix">-</div>
+            <div style="font-size: 12px; color: var(--lss-text-muted);" id="ludorumJuniorVictrixSub">-</div>
           </div>
         </div>
       </div>
@@ -643,19 +755,19 @@
     <div id="view-program" class="view-section">
       <div class="section-card">
         <div class="card-title">
-          <span>📅 Byeenkoms Program & Rooster</span>
+          <span data-i18n="programTitle">📅 Byeenkoms Program & Rooster</span>
         </div>
         <div style="overflow-x: auto;">
           <table class="styled-table" id="tableProgram">
             <thead>
               <tr>
-                <th>Item #</th>
-                <th>Tyd</th>
-                <th>Item Naam</th>
-                <th>Geslag</th>
-                <th>Oud.</th>
-                <th>Plek / Baan</th>
-                <th>Status</th>
+                <th data-i18n="colItemNo">Item #</th>
+                <th data-i18n="colTime">Tyd</th>
+                <th data-i18n="colItem">Item Naam</th>
+                <th data-i18n="colGender">Geslag</th>
+                <th data-i18n="colAge">Oud.</th>
+                <th data-i18n="colVenue">Plek / Baan</th>
+                <th data-i18n="colStatus">Status</th>
               </tr>
             </thead>
             <tbody id="tbodyProgram">
@@ -670,18 +782,18 @@
     <div id="view-records" class="view-section">
       <div class="section-card">
         <div class="card-title">
-          <span>📜 Amptelike Byeenkomsrekords</span>
+          <span data-i18n="recordsTitle">📜 Amptelike Byeenkomsrekords</span>
         </div>
         <div style="overflow-x: auto;">
           <table class="styled-table" id="tableRecords">
             <thead>
               <tr>
-                <th>Item</th>
-                <th>Geslag</th>
-                <th>Oud.</th>
-                <th>Rekordwaarde</th>
-                <th>Houer / Skool</th>
-                <th>Jaar</th>
+                <th data-i18n="colItem">Item</th>
+                <th data-i18n="colGender">Geslag</th>
+                <th data-i18n="colAge">Oud.</th>
+                <th data-i18n="colRecordValue">Rekordwaarde</th>
+                <th data-i18n="colHolder">Houer / Skool</th>
+                <th data-i18n="colYear">Jaar</th>
               </tr>
             </thead>
             <tbody id="tbodyRecords">
@@ -692,31 +804,203 @@
       </div>
     </div>
 
-    <!-- 6. OFFICIALS ENTRY PORTAL (PC RESULT ENTRY) -->
+    <!-- 6. ONLINE ENTRIES FORM (LOCKED FOR SPECTATORS, DROPDOWN FOR ITEMS) -->
+    <div id="view-entries" class="view-section">
+      <div class="section-card" id="entriesLockNotice" style="display: block; text-align: center; padding: 36px 16px;">
+        <div style="font-size: 38px; margin-bottom: 12px;">🔒</div>
+        <h3 style="color: var(--lss-gold); margin-bottom: 8px;" data-i18n="entriesLockedTitle">Inskrywings Gesluit vir Toeskouers</h3>
+        <p style="color: var(--lss-text-muted); font-size: 13px; max-width: 480px; margin: 0 auto 18px;" data-i18n="entriesLockedSub">
+          Aanlyn inskrywings is slegs beskikbaar vir gemagtigde beamptes en skole met die amptelike PIN.
+        </p>
+        <button class="btn-primary" onclick="openRoleModal()">
+          <span data-i18n="btnUnlockEntries">🔑 Voer Beampte PIN in om te Registreer</span>
+        </button>
+      </div>
+
+      <div class="section-card" id="entriesFormContainer" style="display: none;">
+        <div class="card-title">
+          <span data-i18n="onlineEntriesTitle">📝 Aanlyn Inskrywingsvorm vir Skole</span>
+          <span style="font-size: 12px; color: var(--lss-green);">● Gemagtig</span>
+        </div>
+        <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 16px;" data-i18n="onlineEntriesSub">
+          Kies die skool, voer atleetbesonderhede in en merk die items met die aftrek- en keuselys.
+        </p>
+        <form id="formOnlineEntry" onsubmit="submitOnlineAthlete(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="lblSchool">Skool Naam</label>
+              <input type="text" class="form-control" id="entrySchool" placeholder="bv. Laerskool Swartland" required>
+            </div>
+            <div class="form-group">
+              <label data-i18n="lblFirstName">Atleet Voornaam</label>
+              <input type="text" class="form-control" id="entryFirstName" placeholder="bv. Pieter" required>
+            </div>
+            <div class="form-group">
+              <label data-i18n="lblLastName">Atleet Van</label>
+              <input type="text" class="form-control" id="entryLastName" placeholder="bv. Smit" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="lblGender">Geslag</label>
+              <select class="form-control" id="entryGender" onchange="renderEventPills()" required>
+                <option value="Seuns">Seuns</option>
+                <option value="Dogters">Dogters</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label data-i18n="lblAgeGroup">Ouderdomsgroep</label>
+              <select class="form-control" id="entryAge" onchange="renderEventPills()" required>
+                <option value="7">o/7</option>
+                <option value="8">o/8</option>
+                <option value="9">o/9</option>
+                <option value="10">o/10</option>
+                <option value="11">o/11</option>
+                <option value="12">o/12</option>
+                <option value="13">o/13</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label data-i18n="lblQuickAdd">Voeg Item Vinnig By (Aftreklys)</label>
+              <select class="form-control" id="selectQuickAddEvent" onchange="quickAddEventPill()">
+                <option value="" data-i18n="optSelectEvent">-- Kies 'n item uit die lys --</option>
+                <optgroup label="Hardloop (Track)">
+                  <option value="50m">50m</option>
+                  <option value="60m">60m</option>
+                  <option value="80m">80m</option>
+                  <option value="100m">100m</option>
+                  <option value="150m">150m</option>
+                  <option value="200m">200m</option>
+                  <option value="1200m">1200m</option>
+                  <option value="1500m">1500m</option>
+                  <option value="4x100m Aflos">4x100m Aflos</option>
+                </optgroup>
+                <optgroup label="Velditems (Field)">
+                  <option value="Verspring">Verspring (Long Jump)</option>
+                  <option value="Hoogspring">Hoogspring (High Jump)</option>
+                  <option value="Gewigstoot">Gewigstoot (Shot Put)</option>
+                  <option value="Skyfwerp">Skyfwerp (Discus)</option>
+                  <option value="Spiesgooi">Spiesgooi (Javelin)</option>
+                </optgroup>
+                <optgroup label="Hekkies & Stap">
+                  <option value="70m Hekkies">70m Hekkies</option>
+                  <option value="75m Hekkies">75m Hekkies</option>
+                  <option value="80m Hekkies">80m Hekkies</option>
+                  <option value="150m Hekkies">150m Hekkies</option>
+                  <option value="200m Hekkies">200m Hekkies</option>
+                  <option value="1500m Stap">1500m Stap</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="lblSelectedItems">Items Gekies vir Atleet (Tik op enige item om te kies/ontkies):</label>
+            <div class="events-pill-container" id="eventsPillContainer">
+              <!-- Dynamically Populated Event Pills -->
+            </div>
+            <div style="font-size: 11px; color: var(--lss-text-muted); margin-top: 4px;" id="selectedEventsSummary">
+              Gekies: Geen
+            </div>
+          </div>
+
+          <div style="margin-top: 14px;">
+            <button type="submit" class="btn-primary" id="btnSubmitOnlineAthlete">
+              ➕ <span data-i18n="btnRegisterAthlete">Registreer Atleet Aanlyn</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 7. BULK CSV IMPORT & EXCEL HELPER (MAKING CSV EASY) -->
+    <div id="view-bulk" class="view-section">
+      <div class="section-card">
+        <div class="card-title">
+          <span data-i18n="bulkTitle">📂 Massainvoer van Atlete (CSV & Excel)</span>
+        </div>
+
+        <!-- Easy CSV Explanation Box -->
+        <div style="background: rgba(244, 196, 48, 0.08); border: 1px solid var(--lss-gold); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+          <h4 style="color: var(--lss-gold); font-size: 13px; margin-bottom: 4px;" data-i18n="easyCsvHeader">💡 Maak CSV Maklik & Pynloos vir Beginners:</h4>
+          <p style="font-size: 12px; color: var(--lss-text-light); line-height: 1.5;" data-i18n="easyCsvDesc">
+            Jy hoef nie met ingewikkelde kommas te sukkel nie! Kies eenvoudig jou rye in <strong>Microsoft Excel of Google Sigblaaie</strong>, druk <strong>Ctrl+C (Kopieer)</strong>, en klik hieronder op <strong>"Plak vanaf Excel"</strong>. Ons stelsel verwerk die kolomme outomaties!
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;">
+          <button class="btn-primary" onclick="downloadOfficialExcelTemplate()">
+            📥 <span data-i18n="btnDownloadTemplate">Laai Amptelike Excel-Sjabloon Af</span>
+          </button>
+          <button class="btn-secondary" onclick="openPasteExcelModal()">
+            📋 <span data-i18n="btnPasteExcel">Plak direk vanaf Excel (Ctrl+V)</span>
+          </button>
+        </div>
+
+        <!-- Drag and drop zone for CSV file -->
+        <div class="drag-drop-zone" onclick="document.getElementById('csvFileInput').click()">
+          <input type="file" id="csvFileInput" accept=".csv,.txt" style="display: none;" onchange="handleCsvFileSelected(event)">
+          <div style="font-size: 28px; margin-bottom: 6px;">📄</div>
+          <strong style="color: var(--lss-gold);" data-i18n="dragDropTitle">Klik of Sleep 'n CSV-lêer hierheen</strong>
+          <p style="font-size: 12px; color: var(--lss-text-muted); margin-top: 4px;" data-i18n="dragDropSub">
+            Ondersteun die Laerskool Swartland Inskrywingsdokument (Prentjie 1 formaat met 'x' merke) of gewone CSV.
+          </p>
+        </div>
+
+        <!-- CSV Preview Table -->
+        <div id="bulkPreviewContainer" style="display: none; margin-top: 16px;">
+          <div class="card-title">
+            <span id="bulkPreviewCount" style="color: var(--lss-green);">0 Atlete Gevind</span>
+            <button class="btn-primary" id="btnConfirmBulkImport" onclick="confirmBulkImport()">
+              ✅ <span data-i18n="btnConfirmImport">Voer Alles In na Firestore</span>
+            </button>
+          </div>
+          <div style="overflow-x: auto; max-height: 320px;">
+            <table class="styled-table" id="tableBulkPreview">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Voornaam</th>
+                  <th>Van</th>
+                  <th>Skool</th>
+                  <th>Geslag</th>
+                  <th>Oud.</th>
+                  <th>Gekose Items</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyBulkPreview"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. OFFICIALS ENTRY PORTAL (PC RESULT ENTRY) -->
     <div id="view-officials" class="view-section">
       <div class="section-card">
         <div class="card-title">
-          <span>⌨️ Beampte Uitslae Tik-Portaal (PC Rekenaar Invoer)</span>
+          <span data-i18n="officialsPortalTitle">⌨️ Beampte Uitslae Tik-Portaal (PC Rekenaar Invoer)</span>
           <span style="font-size: 12px; color: var(--lss-green);">● Gemagtig as Beampte</span>
         </div>
-        <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 16px;">
+        <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 16px;" data-i18n="officialsPortalSub">
           Tik amptelike uitslae direk vanaf jou rekenaarsleutelbord in. Dit sinkroniseer onmiddellik na alle fone en die lewendige webwerf.
         </p>
         <form id="formOfficialResult" onsubmit="submitOfficialResult(event)">
           <div class="form-row">
             <div class="form-group">
-              <label>Item Naam</label>
+              <label data-i18n="lblEventName">Item Naam</label>
               <input type="text" class="form-control" id="inpEventName" placeholder="bv. 100m, Gewigstoot, Verspring" required>
             </div>
             <div class="form-group">
-              <label>Geslag</label>
+              <label data-i18n="lblGender">Geslag</label>
               <select class="form-control" id="inpGender" required>
                 <option value="Seuns">Seuns</option>
                 <option value="Dogters">Dogters</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Ouderdomsgroep</label>
+              <label data-i18n="lblAgeGroup">Ouderdomsgroep</label>
               <select class="form-control" id="inpAgeGroup" required>
                 <option value="7">o/7</option>
                 <option value="8">o/8</option>
@@ -730,132 +1014,335 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Plek (1, 2, 3...)</label>
+              <label data-i18n="lblPlace">Plek (1, 2, 3...)</label>
               <input type="number" class="form-control" id="inpPlace" min="1" max="50" value="1" required>
             </div>
             <div class="form-group">
-              <label>Atleet Naam & Van</label>
+              <label data-i18n="lblAthleteName">Atleet Naam & Van</label>
               <input type="text" class="form-control" id="inpAthleteName" placeholder="bv. Johan van der Merwe" required>
             </div>
             <div class="form-group">
-              <label>Skool</label>
+              <label data-i18n="lblSchool">Skool</label>
               <input type="text" class="form-control" id="inpSchool" placeholder="bv. Laerskool Swartland" required>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Tyd of Afstand</label>
+              <label data-i18n="lblResultValue">Tyd of Afstand</label>
               <input type="text" class="form-control" id="inpResultValue" placeholder="bv. 12.34s of 4.56m" required>
             </div>
             <div class="form-group">
-              <label>ASA Punte (Opsioneel / Skatting)</label>
+              <label data-i18n="lblAsaPoints">ASA Punte (Opsioneel / Outomaties)</label>
               <input type="number" class="form-control" id="inpAsaPoints" min="0" max="1200" placeholder="bv. 650">
             </div>
           </div>
           <div style="margin-top: 10px;">
             <button type="submit" class="btn-primary" id="btnSubmitResult">
-              💾 Stoor Uitslag na Firestore
+              💾 <span data-i18n="btnSaveResult">Stoor Uitslag na Firestore</span>
             </button>
           </div>
         </form>
       </div>
     </div>
 
-    <!-- 7. PRINT CENTER -->
+    <!-- 9. PRINT CENTER -->
     <div id="view-print" class="view-section">
       <div class="section-card no-print">
         <div class="card-title">
-          <span>🖨️ Drukkerystelsel (Print Sheets)</span>
+          <span data-i18n="printTitle">🖨️ Drukkerystelsel (Print Sheets)</span>
         </div>
-        <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 16px;">
-          Kies 'n dokument om direk op jou kantoordrukker uit te druk op A4 formaat:
+        <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 16px;" data-i18n="printSub">
+          Kies 'n dokument om direk op jou kantoordrukker uit te druk op netjiese A4 formaat:
         </p>
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-          <button class="btn-primary" onclick="prepareAndPrint('standings')">🖨️ Druk Skole Ranglys</button>
-          <button class="btn-primary" onclick="prepareAndPrint('results')">🖨️ Druk Alle Uitslae</button>
-          <button class="btn-primary" onclick="prepareAndPrint('program')">🖨️ Druk Program Rooster</button>
-          <button class="btn-primary" onclick="prepareAndPrint('records')">🖨️ Druk Rekordlys</button>
+          <button class="btn-primary" onclick="prepareAndPrint('standings')">🖨️ <span data-i18n="btnPrintStandings">Druk Skole Ranglys</span></button>
+          <button class="btn-primary" onclick="prepareAndPrint('results')">🖨️ <span data-i18n="btnPrintResults">Druk Alle Uitslae</span></button>
+          <button class="btn-primary" onclick="prepareAndPrint('ludorum')">🖨️ <span data-i18n="btnPrintLudorum">Druk Victor & Victrix</span></button>
+          <button class="btn-primary" onclick="prepareAndPrint('program')">🖨️ <span data-i18n="btnPrintProgram">Druk Program Rooster</span></button>
+          <button class="btn-primary" onclick="prepareAndPrint('records')">🖨️ <span data-i18n="btnPrintRecords">Druk Rekordlys</span></button>
         </div>
-      </div>
-    </div>
-
-    <!-- 8. ONLINE ENTRIES FORM -->
-    <div id="view-entries" class="view-section">
-      <div class="section-card">
-        <div class="card-title">
-          <span>📝 Aanlyn Inskrywingsvorm vir Skole</span>
-        </div>
-        <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 16px;">
-          Skole kan hier hul atlete direk intik, óf die amptelike Excel-sigblad aflaai en invul.
-        </p>
-        <form id="formOnlineEntry" onsubmit="submitOnlineAthlete(event)">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Skool Naam</label>
-              <input type="text" class="form-control" id="entrySchool" placeholder="bv. Laerskool Swartland" required>
-            </div>
-            <div class="form-group">
-              <label>Atleet Voornaam</label>
-              <input type="text" class="form-control" id="entryFirstName" placeholder="bv. Pieter" required>
-            </div>
-            <div class="form-group">
-              <label>Atleet Van</label>
-              <input type="text" class="form-control" id="entryLastName" placeholder="bv. Smit" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Geslag</label>
-              <select class="form-control" id="entryGender" required>
-                <option value="Seuns">Seuns</option>
-                <option value="Dogters">Dogters</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Ouderdomsgroep</label>
-              <select class="form-control" id="entryAge" required>
-                <option value="7">o/7</option>
-                <option value="8">o/8</option>
-                <option value="9">o/9</option>
-                <option value="10">o/10</option>
-                <option value="11">o/11</option>
-                <option value="12">o/12</option>
-                <option value="13">o/13</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Items Ingeskryf (Gekies)</label>
-              <input type="text" class="form-control" id="entryEvents" placeholder="bv. 100m, Verspring, Aflos" required>
-            </div>
-          </div>
-          <div style="margin-top: 10px;">
-            <button type="submit" class="btn-primary">
-              ➕ Registreer Atleet Aanlyn
-            </button>
-          </div>
-        </form>
       </div>
     </div>
 
   </main>
 
+  <!-- Sticky Bottom Utility Bar (Language Toggle, Share & Official Toggle) -->
+  <footer class="bottom-utility-bar no-print">
+    <div class="bottom-bar-left">
+      <!-- Language Button moved to bottom -->
+      <button class="btn-lang-toggle" onclick="toggleLanguage()" id="btnLangToggle">
+        <span>🇿🇦 Afrikaans</span>
+      </button>
+
+      <!-- Official Mode Toggle -->
+      <button class="btn-official-bottom" id="roleBtn" onclick="toggleRoleModal()">
+        <span>🔒 Beampte Aanmelding</span>
+      </button>
+    </div>
+
+    <div class="bottom-bar-right">
+      <!-- Share Button moved to bottom -->
+      <button class="btn-whatsapp-bottom" onclick="shareWhatsAppLink()">
+        <span>📲 Deel op WhatsApp</span>
+      </button>
+      <button class="btn-copy-bottom" onclick="copyWebLink()">
+        <span>📋 Kopieer Skakel</span>
+      </button>
+    </div>
+  </footer>
+
   <!-- PIN Entry Modal for Officials -->
   <div class="modal-overlay" id="pinModal">
     <div class="modal-card">
-      <h3 style="color: var(--lss-gold); margin-bottom: 10px;">🔒 Beampte Aanmelding</h3>
-      <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 16px;">
-        Tik die amptelike 4-syfer PIN in om uitslae in te voer of drukwerk te doen (Verstek: 1920):
+      <h3 style="color: var(--lss-gold); margin-bottom: 10px;" data-i18n="modalPinTitle">🔒 Beampte Aanmelding</h3>
+      <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 16px;" data-i18n="modalPinSub">
+        Tik die amptelike 4-syfer PIN in om inskrywings te bestuur of uitslae in te voer (Verstek: 1920):
       </p>
       <input type="password" id="modalPinInput" class="form-control" placeholder="****" style="text-align: center; font-size: 20px; letter-spacing: 6px; margin-bottom: 16px;" maxlength="8">
       <div style="display: flex; gap: 10px; justify-content: center;">
-        <button class="btn-secondary" onclick="closeRoleModal()">Kanselleer</button>
-        <button class="btn-primary" onclick="verifyOfficialPin()">Bevestig PIN</button>
+        <button class="btn-secondary" onclick="closeRoleModal()" data-i18n="btnCancel">Kanselleer</button>
+        <button class="btn-primary" onclick="verifyOfficialPin()" data-i18n="btnConfirmPin">Bevestig PIN</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paste from Excel Modal -->
+  <div class="modal-overlay" id="pasteExcelModal">
+    <div class="modal-card" style="max-width: 520px;">
+      <h3 style="color: var(--lss-gold); margin-bottom: 8px;" data-i18n="pasteModalTitle">📋 Plak direk vanaf Excel</h3>
+      <p style="font-size: 12px; color: var(--lss-text-muted); margin-bottom: 12px;" data-i18n="pasteModalSub">
+        Kies jou atleet-rye in Excel/Google Sheets, druk Ctrl+C, en plak dit hieronder (Ctrl+V):
+      </p>
+      <textarea id="pasteExcelTextarea" class="form-control" rows="8" placeholder="Voornaam&#9;Van&#9;Skool&#9;Geslag&#9;Oud&#9;Items..." style="font-family: monospace; font-size: 12px;"></textarea>
+      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
+        <button class="btn-secondary" onclick="closePasteExcelModal()" data-i18n="btnCancel">Kanselleer</button>
+        <button class="btn-primary" onclick="processPastedExcel()" data-i18n="btnParseExcel">Verwerk Teks</button>
       </div>
     </div>
   </div>
 
   <script>
-    // 1. Firebase Configuration from Project Credentials
+    // 1. Language Dictionary (Afrikaans & English)
+    let currentLang = "af";
+    const i18n = {
+      af: {
+        appTitle: "Laerskool Swartland",
+        appSubtitle: "Amptelike Atletiek Byeenkoms Portaal",
+        liveBadge: "INTYDS",
+        statAthletes: "Atlete Ingeskryf",
+        statResults: "Uitslae Voltooi",
+        statSchools: "Deelnemende Skole",
+        statMedals: "Medaljes Toegeken",
+        statRecords: "Rekords",
+        tabResults: "⏱️ Lewendige Uitslae",
+        tabStandings: "🏆 Skole Ranglys",
+        tabLudorum: "🌟 Victor & Victrix",
+        tabProgram: "📅 Program Rooster",
+        tabRecords: "📜 Rekords",
+        tabEntries: "📝 Aanlyn Inskrywings",
+        tabBulk: "📂 CSV Massainvoer",
+        tabOfficials: "⌨️ Beampte Tik-Portaal",
+        tabPrint: "🖨️ Drukkerystelsel",
+        resultsTitle: "⏱️ Jongste Uitslae (Lewendig op die Veld)",
+        resultsSub: "Outomaties bygewerk via Firestore",
+        colPlace: "Plek",
+        colItem: "Item",
+        colGender: "Geslag",
+        colAge: "Oud.",
+        colAthlete: "Atleet",
+        colSchool: "Skool",
+        colResult: "Tyd / Afstand",
+        colPoints: "ASA Punte",
+        waitingResults: "Wag vir eerste amptelike uitslae van beoordelaars...",
+        standingsTitle: "🏆 Skole Ranglys & Medaljetelling (Kampioenskool)",
+        colRank: "Rang",
+        colGold: "Goud 🥇",
+        colSilver: "Silwer 🥈",
+        colBronze: "Brons 🥉",
+        colEvents: "Items",
+        colTotalPoints: "Totale Punte",
+        ludorumTitle: "🌟 Victor & Victrix Ludorum Toekennings",
+        ludorumOverallVictor: "👑 Algehele Victor Ludorum",
+        ludorumOverallVictrix: "👑 Algehele Victrix Ludorum",
+        ludorumSeniorVictor: "🏅 Senior Victor Ludorum (o/12 & o/13)",
+        ludorumSeniorVictrix: "🏅 Senior Victrix Ludorum (o/12 & o/13)",
+        ludorumJuniorVictor: "⭐ Junior Victor Ludorum (o/7 - o/11)",
+        ludorumJuniorVictrix: "⭐ Junior Victrix Ludorum (o/7 - o/11)",
+        programTitle: "📅 Byeenkoms Program & Rooster",
+        colItemNo: "Item #",
+        colTime: "Tyd",
+        colVenue: "Plek / Baan",
+        colStatus: "Status",
+        recordsTitle: "📜 Amptelike Byeenkomsrekords",
+        colRecordValue: "Rekordwaarde",
+        colHolder: "Houer / Skool",
+        colYear: "Jaar",
+        entriesLockedTitle: "Inskrywings Gesluit vir Toeskouers",
+        entriesLockedSub: "Aanlyn inskrywings is slegs beskikbaar vir gemagtigde beamptes en skole met die amptelike PIN.",
+        btnUnlockEntries: "🔑 Voer Beampte PIN in om te Registreer",
+        onlineEntriesTitle: "📝 Aanlyn Inskrywingsvorm vir Skole",
+        onlineEntriesSub: "Kies die skool, voer atleetbesonderhede in en merk die items met die aftrek- en keuselys.",
+        lblSchool: "Skool Naam",
+        lblFirstName: "Atleet Voornaam",
+        lblLastName: "Atleet Van",
+        lblGender: "Geslag",
+        lblAgeGroup: "Ouderdomsgroep",
+        lblQuickAdd: "Voeg Item Vinnig By (Aftreklys)",
+        optSelectEvent: "-- Kies 'n item uit die lys --",
+        lblSelectedItems: "Items Gekies vir Atleet (Tik op enige item om te kies/ontkies):",
+        btnRegisterAthlete: "Registreer Atleet Aanlyn",
+        bulkTitle: "📂 Massainvoer van Atlete (CSV & Excel)",
+        easyCsvHeader: "💡 Maak CSV Maklik & Pynloos vir Beginners:",
+        easyCsvDesc: "Jy hoef nie met ingewikkelde kommas te sukkel nie! Kies eenvoudig jou rye in Microsoft Excel of Google Sigblaaie, druk Ctrl+C (Kopieer), en klik hieronder op 'Plak vanaf Excel'. Ons stelsel verwerk die kolomme outomaties!",
+        btnDownloadTemplate: "Laai Amptelike Excel-Sjabloon Af",
+        btnPasteExcel: "Plak direk vanaf Excel (Ctrl+V)",
+        dragDropTitle: "Klik of Sleep 'n CSV-lêer hierheen",
+        dragDropSub: "Ondersteun die Laerskool Swartland Inskrywingsdokument (Prentjie 1 formaat met 'x' merke) of gewone CSV.",
+        btnConfirmImport: "Voer Alles In na Firestore",
+        officialsPortalTitle: "⌨️ Beampte Uitslae Tik-Portaal (PC Rekenaar Invoer)",
+        officialsPortalSub: "Tik amptelike uitslae direk vanaf jou rekenaarsleutelbord in. Dit sinkroniseer onmiddellik na alle fone en die lewendige webwerf.",
+        lblEventName: "Item Naam",
+        lblPlace: "Plek (1, 2, 3...)",
+        lblAthleteName: "Atleet Naam & Van",
+        lblResultValue: "Tyd of Afstand",
+        lblAsaPoints: "ASA Punte (Opsioneel / Outomaties)",
+        btnSaveResult: "Stoor Uitslag na Firestore",
+        printTitle: "🖨️ Drukkerystelsel (Print Sheets)",
+        printSub: "Kies 'n dokument om direk op jou kantoordrukker uit te druk op netjiese A4 formaat:",
+        btnPrintStandings: "Druk Skole Ranglys",
+        btnPrintResults: "Druk Alle Uitslae",
+        btnPrintLudorum: "Druk Victor & Victrix",
+        btnPrintProgram: "Druk Program Rooster",
+        btnPrintRecords: "Druk Rekordlys",
+        modalPinTitle: "🔒 Beampte Aanmelding",
+        modalPinSub: "Tik die amptelike 4-syfer PIN in om inskrywings te bestuur of uitslae in te voer (Verstek: 1920):",
+        btnCancel: "Kanselleer",
+        btnConfirmPin: "Bevestig PIN",
+        pasteModalTitle: "📋 Plak direk vanaf Excel",
+        pasteModalSub: "Kies jou atleet-rye in Excel/Google Sigblaaie, druk Ctrl+C, en plak dit hieronder (Ctrl+V):",
+        btnParseExcel: "Verwerk Teks"
+      },
+      en: {
+        appTitle: "Laerskool Swartland",
+        appSubtitle: "Official Athletics Meet Portal",
+        liveBadge: "LIVE",
+        statAthletes: "Athletes Entered",
+        statResults: "Results Finished",
+        statSchools: "Participating Schools",
+        statMedals: "Medals Awarded",
+        statRecords: "Records",
+        tabResults: "⏱️ Live Results",
+        tabStandings: "🏆 School Standings",
+        tabLudorum: "🌟 Victor & Victrix",
+        tabProgram: "📅 Program Timetable",
+        tabRecords: "📜 Records",
+        tabEntries: "📝 Online Entries",
+        tabBulk: "📂 Bulk CSV Import",
+        tabOfficials: "⌨️ Official Entry Portal",
+        tabPrint: "🖨️ Print Center",
+        resultsTitle: "⏱️ Latest Results (Live from Field & Track)",
+        resultsSub: "Automatically updated via Firestore",
+        colPlace: "Place",
+        colItem: "Event",
+        colGender: "Gender",
+        colAge: "Age",
+        colAthlete: "Athlete",
+        colSchool: "School",
+        colResult: "Time / Distance",
+        colPoints: "ASA Points",
+        waitingResults: "Waiting for first official results from judges...",
+        standingsTitle: "🏆 School Points Standings & Medals",
+        colRank: "Rank",
+        colGold: "Gold 🥇",
+        colSilver: "Silver 🥈",
+        colBronze: "Bronze 🥉",
+        colEvents: "Events",
+        colTotalPoints: "Total Points",
+        ludorumTitle: "🌟 Victor & Victrix Ludorum Awards",
+        ludorumOverallVictor: "👑 Overall Victor Ludorum",
+        ludorumOverallVictrix: "👑 Overall Victrix Ludorum",
+        ludorumSeniorVictor: "🏅 Senior Victor Ludorum (u/12 & u/13)",
+        ludorumSeniorVictrix: "🏅 Senior Victrix Ludorum (u/12 & u/13)",
+        ludorumJuniorVictor: "⭐ Junior Victor Ludorum (u/7 - u/11)",
+        ludorumJuniorVictrix: "⭐ Junior Victrix Ludorum (u/7 - u/11)",
+        programTitle: "📅 Meet Program & Timetable",
+        colItemNo: "Item #",
+        colTime: "Time",
+        colVenue: "Venue / Track",
+        colStatus: "Status",
+        recordsTitle: "📜 Official Meet Records",
+        colRecordValue: "Record Value",
+        colHolder: "Holder / School",
+        colYear: "Year",
+        entriesLockedTitle: "Entries Locked for Spectators",
+        entriesLockedSub: "Online entries are strictly for authorized officials and schools with the official PIN.",
+        btnUnlockEntries: "🔑 Enter Official PIN to Register",
+        onlineEntriesTitle: "📝 Online Entry Form for Schools",
+        onlineEntriesSub: "Select school, enter athlete details and tick items using the dropdown & checklist.",
+        lblSchool: "School Name",
+        lblFirstName: "Athlete First Name",
+        lblLastName: "Athlete Last Name",
+        lblGender: "Gender",
+        lblAgeGroup: "Age Group",
+        lblQuickAdd: "Quick Add Event (Dropdown)",
+        optSelectEvent: "-- Select an event from the list --",
+        lblSelectedItems: "Selected Events for Athlete (Click any pill to select/deselect):",
+        btnRegisterAthlete: "Register Athlete Online",
+        bulkTitle: "📂 Bulk Athlete Import (CSV & Excel)",
+        easyCsvHeader: "💡 Making CSV Easy & Friendly for Beginners:",
+        easyCsvDesc: "No need to deal with confusing commas! Simply select rows in Microsoft Excel or Google Sheets, press Ctrl+C (Copy), and click 'Paste from Excel' below. Our system parses columns automatically!",
+        btnDownloadTemplate: "Download Official Excel Template",
+        btnPasteExcel: "Paste directly from Excel (Ctrl+V)",
+        dragDropTitle: "Click or Drag a CSV file here",
+        dragDropSub: "Supports the Laerskool Swartland Entry Sheet (Image 1 format with 'x' marks) or standard CSV.",
+        btnConfirmImport: "Import All to Firestore",
+        officialsPortalTitle: "⌨️ Officials Results Entry Portal (PC Keyboard)",
+        officialsPortalSub: "Type official results directly using your PC keyboard. Syncs instantly across all devices.",
+        lblEventName: "Event Name",
+        lblPlace: "Place (1, 2, 3...)",
+        lblAthleteName: "Athlete Name & Surname",
+        lblResultValue: "Time or Distance",
+        lblAsaPoints: "ASA Points (Optional / Auto)",
+        btnSaveResult: "Save Result to Firestore",
+        printTitle: "🖨️ Print Center (Sheets)",
+        printSub: "Choose a document to print directly on your office printer on neat A4 pages:",
+        btnPrintStandings: "Print School Standings",
+        btnPrintResults: "Print All Results",
+        btnPrintLudorum: "Print Victor & Victrix",
+        btnPrintProgram: "Print Program Timetable",
+        btnPrintRecords: "Print Records",
+        modalPinTitle: "🔒 Official Login",
+        modalPinSub: "Enter the official 4-digit PIN to manage entries or record results (Default: 1920):",
+        btnCancel: "Cancel",
+        btnConfirmPin: "Confirm PIN",
+        pasteModalTitle: "📋 Paste directly from Excel",
+        pasteModalSub: "Select athlete rows in Excel/Google Sheets, press Ctrl+C, and paste below (Ctrl+V):",
+        btnParseExcel: "Parse Text"
+      }
+    };
+
+    function toggleLanguage() {
+      currentLang = (currentLang === "af") ? "en" : "af";
+      const btn = document.getElementById("btnLangToggle");
+      if (btn) btn.innerHTML = currentLang === "af" ? "<span>🇿🇦 Afrikaans</span>" : "<span>🇬🇧 English</span>";
+      
+      // Update all data-i18n elements
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (i18n[currentLang] && i18n[currentLang][key]) {
+          el.innerText = i18n[currentLang][key];
+        }
+      });
+      
+      updateStats();
+      renderResults();
+      renderStandings();
+      renderLudorum();
+      renderProgram();
+      renderRecords();
+    }
+
+    // 2. Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyD4LI5InqpmgXTY9ulf84HtMjkerWLH_Ao",
       authDomain: "gen-lang-client-0986840010.firebaseapp.com",
@@ -865,12 +1352,9 @@
       appId: "1:446964741123:android:3e99e80bcd662d9cdc4a36"
     };
 
-    // Initialize Firebase
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-    
-    // Connect to custom named Firestore database
     const db = firebase.app().firestore("ai-studio-android-swartlan-d1579b6e-c3cc-4480-9c0e-cac716751650");
 
     // State
@@ -879,10 +1363,17 @@
     let recordsData = [];
     let resultsData = [];
     let programData = [];
+    let selectedEventPills = new Set();
+    let pendingBulkAthletes = [];
+
+    const ALL_AVAILABLE_EVENTS = [
+      "50m", "60m", "80m", "100m", "150m", "200m", "1200m", "1500m", "4x100m Aflos",
+      "Verspring", "Hoogspring", "Gewigstoot", "Skyfwerp", "Spiesgooi",
+      "70m Hekkies", "75m Hekkies", "80m Hekkies", "150m Hekkies", "200m Hekkies", "1500m Stap"
+    ];
 
     // Real-time Firestore Listeners
     function initRealtimeStreams() {
-      // Results stream
       db.collection("results").onSnapshot((snapshot) => {
         resultsData = [];
         snapshot.forEach((doc) => resultsData.push({ id: doc.id, ...doc.data() }));
@@ -892,7 +1383,6 @@
         updateStats();
       }, (err) => console.warn("Results stream error:", err));
 
-      // Program stream
       db.collection("program").orderBy("itemNo", "asc").onSnapshot((snapshot) => {
         programData = [];
         snapshot.forEach((doc) => programData.push({ id: doc.id, ...doc.data() }));
@@ -900,7 +1390,6 @@
         updateStats();
       }, (err) => console.warn("Program stream error:", err));
 
-      // Records stream
       db.collection("records").onSnapshot((snapshot) => {
         recordsData = [];
         snapshot.forEach((doc) => recordsData.push({ id: doc.id, ...doc.data() }));
@@ -908,7 +1397,6 @@
         updateStats();
       }, (err) => console.warn("Records stream error:", err));
 
-      // Athletes stream
       db.collection("athletes").onSnapshot((snapshot) => {
         athletesData = [];
         snapshot.forEach((doc) => athletesData.push({ id: doc.id, ...doc.data() }));
@@ -916,22 +1404,21 @@
       }, (err) => console.warn("Athletes stream error:", err));
     }
 
-    // Render Results
+    // Render Results Table
     function renderResults() {
       const tbody = document.getElementById("tbodyResults");
       if (!tbody) return;
       if (resultsData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--lss-text-muted); padding: 24px;">Wag vir eerste amptelike uitslae van beoordelaars...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--lss-text-muted); padding: 24px;">${i18n[currentLang].waitingResults}</td></tr>`;
         return;
       }
 
-      // Sort results by place then points
       const sorted = [...resultsData].sort((a,b) => (a.place || 99) - (b.place || 99));
       let html = "";
       sorted.forEach((r) => {
         const placeBadge = r.place === 1 ? `<span class="badge-place-1">1ste 🥇</span>` :
                            r.place === 2 ? `<span class="badge-place-2">2de 🥈</span>` :
-                           r.place === 3 ? `<span class="badge-place-3">3de 🥉</span>` : `${r.place}de`;
+                           r.place === 3 ? `<span class="badge-place-3">3de 🥉</span>` : `${r.place}`;
         html += `
           <tr>
             <td>${placeBadge}</td>
@@ -948,7 +1435,7 @@
       tbody.innerHTML = html;
     }
 
-    // Render School Standings
+    // Render School Standings Table
     function renderStandings() {
       const tbody = document.getElementById("tbodyStandings");
       if (!tbody) return;
@@ -991,32 +1478,84 @@
       tbody.innerHTML = html;
     }
 
-    // Render Victor & Victrix Ludorum
+    // Render Victor & Victrix Ludorum (Overall, Senior o/12-13, Junior o/7-11)
     function renderLudorum() {
-      const boys = {};
-      const girls = {};
+      const athletesMap = {};
       resultsData.forEach((r) => {
-        const g = (r.gender || "").toLowerCase();
-        const key = (r.athleteName || "").trim() + " (" + (r.school || "").trim() + ")";
-        if (g.startsWith("s") || g.startsWith("m") || g === "seuns") {
-          boys[key] = (boys[key] || 0) + (r.asaPoints || 0);
-        } else {
-          girls[key] = (girls[key] || 0) + (r.asaPoints || 0);
+        const key = (r.athleteName || "").trim().toLowerCase() + "|" + (r.school || "").trim().toLowerCase();
+        if (!athletesMap[key]) {
+          athletesMap[key] = {
+            name: (r.athleteName || "").trim(),
+            school: (r.school || "").trim(),
+            gender: (r.gender || "").trim(),
+            ageGroup: (r.ageGroup || "").trim(),
+            points: 0,
+            events: 0,
+            topEvent: r.eventName || "",
+            topResult: r.resultValue || "",
+            topPoints: r.asaPoints || 0
+          };
+        }
+        athletesMap[key].points += (r.asaPoints || 0);
+        athletesMap[key].events += 1;
+        if ((r.asaPoints || 0) > athletesMap[key].topPoints) {
+          athletesMap[key].topPoints = r.asaPoints;
+          athletesMap[key].topEvent = r.eventName;
+          athletesMap[key].topResult = r.resultValue;
         }
       });
 
-      const topBoy = Object.entries(boys).sort((a,b) => b[1] - a[1])[0];
-      const topGirl = Object.entries(girls).sort((a,b) => b[1] - a[1])[0];
+      const all = Object.values(athletesMap);
+      const boys = all.filter(a => {
+        const g = a.gender.toLowerCase();
+        return g.startsWith("s") || g.startsWith("m") || g === "seuns";
+      }).sort((a,b) => b.points - a.points);
 
+      const girls = all.filter(a => {
+        const g = a.gender.toLowerCase();
+        return g.startsWith("d") || g.startsWith("g") || g.startsWith("f") || g === "dogters";
+      }).sort((a,b) => b.points - a.points);
+
+      // Overall
+      const topBoy = boys[0];
+      const topGirl = girls[0];
+
+      // Senior (o/12 & o/13)
+      const seniorBoy = boys.find(a => a.ageGroup === "12" || a.ageGroup === "13");
+      const seniorGirl = girls.find(a => a.ageGroup === "12" || a.ageGroup === "13");
+
+      // Junior (o/7 - o/11)
+      const juniorBoy = boys.find(a => ["6","7","8","9","10","11"].includes(a.ageGroup));
+      const juniorGirl = girls.find(a => ["6","7","8","9","10","11"].includes(a.ageGroup));
+
+      // Display Overall
       if (topBoy) {
-        document.getElementById("ludorumOverallVictor").innerText = topBoy[0];
-        document.getElementById("ludorumOverallVictorSub").innerText = `${topBoy[1]} Totale ASA Punte`;
-        document.getElementById("ludorumSeniorVictor").innerText = `${topBoy[0]} (${topBoy[1]} pts)`;
+        document.getElementById("ludorumOverallVictor").innerText = `${topBoy.name} (${topBoy.school})`;
+        document.getElementById("ludorumOverallVictorSub").innerText = `${topBoy.points} Totale ASA Punte • Beste: ${topBoy.topEvent} (${topBoy.topResult})`;
       }
       if (topGirl) {
-        document.getElementById("ludorumOverallVictrix").innerText = topGirl[0];
-        document.getElementById("ludorumOverallVictrixSub").innerText = `${topGirl[1]} Totale ASA Punte`;
-        document.getElementById("ludorumSeniorVictrix").innerText = `${topGirl[0]} (${topGirl[1]} pts)`;
+        document.getElementById("ludorumOverallVictrix").innerText = `${topGirl.name} (${topGirl.school})`;
+        document.getElementById("ludorumOverallVictrixSub").innerText = `${topGirl.points} Totale ASA Punte • Beste: ${topGirl.topEvent} (${topGirl.topResult})`;
+      }
+
+      // Display Senior
+      if (seniorBoy) {
+        document.getElementById("ludorumSeniorVictor").innerText = `${seniorBoy.name} (${seniorBoy.school})`;
+        document.getElementById("ludorumSeniorVictorSub").innerText = `o/${seniorBoy.ageGroup} • ${seniorBoy.points} ASA Punte`;
+      }
+      if (seniorGirl) {
+        document.getElementById("ludorumSeniorVictrix").innerText = `${seniorGirl.name} (${seniorGirl.school})`;
+        document.getElementById("ludorumSeniorVictrixSub").innerText = `o/${seniorGirl.ageGroup} • ${seniorGirl.points} ASA Punte`;
+      }
+
+      // Display Junior
+      if (juniorBoy) {
+        document.getElementById("ludorumJuniorVictor").innerText = `${juniorBoy.name} (${juniorBoy.school})`;
+        document.getElementById("ludorumJuniorVictorSub").innerText = `o/${juniorBoy.ageGroup} • ${juniorBoy.points} ASA Punte`;
+      }
+      if (juniorGirl) {
+        document.getElementById("ludorumJuniorVictrix").innerText = `${juniorGirl.name} (${juniorGirl.school})`;
+        document.getElementById("ludorumJuniorVictrixSub").innerText = `o/${juniorGirl.ageGroup} • ${juniorGirl.points} ASA Punte`;
       }
     }
 
@@ -1087,7 +1626,9 @@
       const completed = programData.filter(p => p.status === "Voltooi").length;
       const total = programData.length;
       const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
-      document.getElementById("progressLabel").innerText = `Byeenkoms Vordering: ${completed} van ${total} voltooi (${pct}%)`;
+      document.getElementById("progressLabel").innerText = currentLang === "af"
+        ? `Byeenkoms Vordering: ${completed} van ${total} voltooi (${pct}%)`
+        : `Meet Progress: ${completed} of ${total} finished (${pct}%)`;
       document.getElementById("progressBar").style.width = pct + "%";
     }
 
@@ -1099,12 +1640,25 @@
       const targetSec = document.getElementById("view-" + tabId);
       if (targetSec) targetSec.classList.add("active");
       
-      // highlight active tab button
       const activeBtn = Array.from(document.querySelectorAll(".tab-btn")).find(b => b.getAttribute("onclick").includes(tabId));
       if (activeBtn) activeBtn.classList.add("active");
+
+      if (tabId === "entries") {
+        renderEventPills();
+      }
     }
 
     // PIN Authentication for Officials
+    function openRoleModal() {
+      document.getElementById("pinModal").classList.add("active");
+      document.getElementById("modalPinInput").focus();
+    }
+
+    function closeRoleModal() {
+      document.getElementById("pinModal").classList.remove("active");
+      document.getElementById("modalPinInput").value = "";
+    }
+
     function toggleRoleModal() {
       if (isOfficial) {
         if (confirm("Wil jy Beampte Modus verlaat en terugkeer na Toeskouer Modus?")) {
@@ -1112,14 +1666,8 @@
           updateRoleUI();
         }
       } else {
-        document.getElementById("pinModal").classList.add("active");
-        document.getElementById("modalPinInput").focus();
+        openRoleModal();
       }
-    }
-
-    function closeRoleModal() {
-      document.getElementById("pinModal").classList.remove("active");
-      document.getElementById("modalPinInput").value = "";
     }
 
     function verifyOfficialPin() {
@@ -1128,7 +1676,6 @@
         isOfficial = true;
         closeRoleModal();
         updateRoleUI();
-        switchTab("officials");
         alert("✅ Beampte Modus suksesvol ontsluit! U het nou volle toegang.");
       } else {
         alert("❌ Verkeerde PIN. Die amptelike verstek-PIN is 1920.");
@@ -1139,23 +1686,118 @@
       const btn = document.getElementById("roleBtn");
       const tabOfficials = document.getElementById("tabOfficials");
       const tabPrint = document.getElementById("tabPrint");
+      const tabBulk = document.getElementById("tabBulk");
+      const entriesLockNotice = document.getElementById("entriesLockNotice");
+      const entriesFormContainer = document.getElementById("entriesFormContainer");
 
       if (isOfficial) {
-        btn.innerHTML = "<span>⭐ Beampte Modus (Ontsluit)</span>";
+        btn.innerHTML = "<span>⭐ Beampte Modus</span>";
         btn.style.borderColor = "var(--lss-green)";
         btn.style.color = "var(--lss-green)";
         if (tabOfficials) tabOfficials.style.display = "flex";
         if (tabPrint) tabPrint.style.display = "flex";
+        if (tabBulk) tabBulk.style.display = "flex";
+        if (entriesLockNotice) entriesLockNotice.style.display = "none";
+        if (entriesFormContainer) entriesFormContainer.style.display = "block";
       } else {
         btn.innerHTML = "<span>🔒 Beampte Aanmelding</span>";
         btn.style.borderColor = "var(--lss-gold)";
         btn.style.color = "var(--lss-gold)";
         if (tabOfficials) tabOfficials.style.display = "none";
         if (tabPrint) tabPrint.style.display = "none";
+        if (tabBulk) tabBulk.style.display = "none";
+        if (entriesLockNotice) entriesLockNotice.style.display = "block";
+        if (entriesFormContainer) entriesFormContainer.style.display = "none";
       }
     }
 
-    // Submit Official Result from PC keyboard
+    // Event Pills (Interactive Dropdown & Checklist)
+    function renderEventPills() {
+      const container = document.getElementById("eventsPillContainer");
+      if (!container) return;
+      container.innerHTML = "";
+
+      ALL_AVAILABLE_EVENTS.forEach((ev) => {
+        const pill = document.createElement("div");
+        pill.className = "event-pill" + (selectedEventPills.has(ev) ? " selected" : "");
+        pill.innerText = ev;
+        pill.onclick = () => {
+          if (selectedEventPills.has(ev)) {
+            selectedEventPills.delete(ev);
+          } else {
+            selectedEventPills.add(ev);
+          }
+          renderEventPills();
+          updateSelectedEventsSummary();
+        };
+        container.appendChild(pill);
+      });
+      updateSelectedEventsSummary();
+    }
+
+    function quickAddEventPill() {
+      const sel = document.getElementById("selectQuickAddEvent");
+      const val = sel.value;
+      if (val) {
+        selectedEventPills.add(val);
+        renderEventPills();
+        updateSelectedEventsSummary();
+        sel.value = "";
+      }
+    }
+
+    function updateSelectedEventsSummary() {
+      const summary = document.getElementById("selectedEventsSummary");
+      if (!summary) return;
+      if (selectedEventPills.size === 0) {
+        summary.innerText = currentLang === "af" ? "Gekies: Geen items gekies nie." : "Selected: No events selected.";
+      } else {
+        summary.innerText = (currentLang === "af" ? "Gekies: " : "Selected: ") + Array.from(selectedEventPills).join(", ");
+      }
+    }
+
+    // Submit Online Athlete Registration
+    async function submitOnlineAthlete(e) {
+      e.preventDefault();
+      const school = document.getElementById("entrySchool").value.trim();
+      const firstName = document.getElementById("entryFirstName").value.trim();
+      const lastName = document.getElementById("entryLastName").value.trim();
+      const gender = document.getElementById("entryGender").value;
+      const ageGroup = document.getElementById("entryAge").value;
+
+      if (selectedEventPills.size === 0) {
+        alert(currentLang === "af" ? "Kies asseblief ten minste een item vir die atleet." : "Please select at least one event for the athlete.");
+        return;
+      }
+
+      const btn = document.getElementById("btnSubmitOnlineAthlete");
+      btn.disabled = true;
+
+      try {
+        const id = "ath_" + Date.now();
+        await db.collection("athletes").doc(id).set({
+          firstName: firstName,
+          lastName: lastName,
+          school: school,
+          gender: gender,
+          ageGroup: ageGroup,
+          events: Array.from(selectedEventPills),
+          userId: "online_web_portal",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert(`✅ Atleet ${firstName} ${lastName} (${school}) suksesvol geregistreer!`);
+        document.getElementById("entryFirstName").value = "";
+        document.getElementById("entryLastName").value = "";
+        selectedEventPills.clear();
+        renderEventPills();
+      } catch (err) {
+        alert("Fout met registrasie: " + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // Submit Official Result from PC Keyboard
     async function submitOfficialResult(e) {
       e.preventDefault();
       const eventName = document.getElementById("inpEventName").value.trim();
@@ -1189,7 +1831,10 @@
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         alert(`✅ Uitslag vir ${athleteName} (${school}) suksesvol gestoor!`);
-        document.getElementById("formOfficialResult").reset();
+        document.getElementById("inpPlace").value = place + 1;
+        document.getElementById("inpAthleteName").value = "";
+        document.getElementById("inpResultValue").value = "";
+        document.getElementById("inpAsaPoints").value = "";
       } catch (err) {
         alert("Fout met stoor: " + err.message);
       } finally {
@@ -1198,44 +1843,200 @@
       }
     }
 
-    // Submit Online Athlete Registration
-    async function submitOnlineAthlete(e) {
-      e.preventDefault();
-      const school = document.getElementById("entrySchool").value.trim();
-      const firstName = document.getElementById("entryFirstName").value.trim();
-      const lastName = document.getElementById("entryLastName").value.trim();
-      const gender = document.getElementById("entryGender").value;
-      const ageGroup = document.getElementById("entryAge").value;
-      const eventsStr = document.getElementById("entryEvents").value.trim();
-      const eventsList = eventsStr.split(",").map(s => s.trim()).filter(s => s.length > 0);
+    // Easy CSV: Paste from Excel / Google Sheets
+    function openPasteExcelModal() {
+      document.getElementById("pasteExcelModal").classList.add("active");
+      document.getElementById("pasteExcelTextarea").focus();
+    }
 
-      try {
-        const id = "ath_" + Date.now();
-        await db.collection("athletes").doc(id).set({
-          firstName: firstName,
-          lastName: lastName,
-          school: school,
-          gender: gender,
-          ageGroup: ageGroup,
-          events: eventsList,
-          userId: "online_school_entry",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        alert(`✅ Atleet ${firstName} ${lastName} (${school}) suksesvol geregistreer!`);
-        document.getElementById("formOnlineEntry").reset();
-      } catch (err) {
-        alert("Fout met registrasie: " + err.message);
+    function closePasteExcelModal() {
+      document.getElementById("pasteExcelModal").classList.remove("active");
+      document.getElementById("pasteExcelTextarea").value = "";
+    }
+
+    function processPastedExcel() {
+      const text = document.getElementById("pasteExcelTextarea").value.trim();
+      if (!text) return;
+      parseAthletesText(text);
+      closePasteExcelModal();
+    }
+
+    function handleCsvFileSelected(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        parseAthletesText(event.target.result);
+      };
+      reader.readAsText(file);
+    }
+
+    // Smart Parser for Image 1 Layout & Tab/CSV Delimited Lines
+    function parseAthletesText(rawText) {
+      const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+      const parsed = [];
+
+      lines.forEach((line) => {
+        // Skip header lines
+        if (line.toLowerCase().includes("laerskool swartland") || line.toLowerCase().includes("voornaam") || line.toLowerCase().includes("first name")) {
+          return;
+        }
+
+        // Support tabs or commas
+        const cols = line.includes("\t") ? line.split("\t").map(c => c.trim()) : line.split(",").map(c => c.trim().replace(/^"|"$/g, ''));
+        if (cols.length < 3) return;
+
+        // Image 1 format check: col 0 = Age, col 1 = FirstName, col 2 = LastName, col 3 = School, col 4..N = Events with 'x'
+        const isNumericAgeFirst = /^\d{1,2}$/.test(cols[0]);
+        if (isNumericAgeFirst && cols.length >= 4) {
+          const age = cols[0];
+          const fn = cols[1];
+          const ln = cols[2];
+          const sc = cols[3];
+          const evs = [];
+          
+          // Image 1 default column mapping
+          const image1Events = ["50m","60m","80m","100m","150m","200m","1200m","1500m","4x100m Aflos","Verspring","Hoogspring","Gewigstoot","Skyfwerp","Spiesgooi","70m Hekkies","75m Hekkies","80m Hekkies","150m Hekkies","200m Hekkies","1500m Stap"];
+          for (let i = 4; i < cols.length; i++) {
+            if (cols[i].toLowerCase() === "x" || cols[i].toLowerCase() === "ja" || cols[i] === "1") {
+              const evIdx = i - 4;
+              if (evIdx < image1Events.length) evs.push(image1Events[evIdx]);
+            }
+          }
+
+          if (fn && ln) {
+            parsed.push({
+              firstName: fn,
+              lastName: ln,
+              school: sc || "Laerskool Swartland",
+              gender: "Seuns",
+              ageGroup: age,
+              events: evs.length > 0 ? evs : ["100m"]
+            });
+          }
+        } else {
+          // Standard List: FirstName, LastName, School, Gender, Age, Events
+          const fn = cols[0];
+          const ln = cols[1];
+          const sc = cols[2] || "Laerskool Swartland";
+          const gn = cols[3] || "Seuns";
+          const ag = cols[4] || "13";
+          const evs = cols.slice(5).filter(c => c.length > 0);
+
+          if (fn && ln) {
+            parsed.push({
+              firstName: fn,
+              lastName: ln,
+              school: sc,
+              gender: gn,
+              ageGroup: ag,
+              events: evs.length > 0 ? evs : ["100m"]
+            });
+          }
+        }
+      });
+
+      if (parsed.length > 0) {
+        pendingBulkAthletes = parsed;
+        renderBulkPreview();
+      } else {
+        alert("Kon nie geldige atlete uit die teks of lêer lees nie. Maak seker die rye het Voornaam, Van en Skool.");
       }
     }
 
-    // WhatsApp Sharing
+    function renderBulkPreview() {
+      const container = document.getElementById("bulkPreviewContainer");
+      const tbody = document.getElementById("tbodyBulkPreview");
+      const countEl = document.getElementById("bulkPreviewCount");
+
+      container.style.display = "block";
+      countEl.innerText = `${pendingBulkAthletes.length} Atlete Gereed vir Invoer`;
+      tbody.innerHTML = "";
+
+      pendingBulkAthletes.slice(0, 50).forEach((ath, idx) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${idx + 1}</td>
+            <td><strong>${ath.firstName}</strong></td>
+            <td><strong>${ath.lastName}</strong></td>
+            <td>${ath.school}</td>
+            <td>${ath.gender}</td>
+            <td>o/${ath.ageGroup}</td>
+            <td><span style="color: var(--lss-gold);">${ath.events.join(", ")}</span></td>
+          </tr>
+        `;
+      });
+      if (pendingBulkAthletes.length > 50) {
+        tbody.innerHTML += `<tr><td colspan="7" style="text-align: center; color: var(--lss-text-muted);">... en nog ${pendingBulkAthletes.length - 50} atlete.</td></tr>`;
+      }
+    }
+
+    async function confirmBulkImport() {
+      if (pendingBulkAthletes.length === 0) return;
+      const btn = document.getElementById("btnConfirmBulkImport");
+      btn.disabled = true;
+      btn.innerText = "Voer tans in...";
+
+      try {
+        const batch = db.batch();
+        pendingBulkAthletes.forEach((ath, idx) => {
+          const docRef = db.collection("athletes").doc("ath_bulk_" + Date.now() + "_" + idx);
+          batch.set(docRef, {
+            firstName: ath.firstName,
+            lastName: ath.lastName,
+            school: ath.school,
+            gender: ath.gender,
+            ageGroup: ath.ageGroup,
+            events: ath.events,
+            userId: "bulk_web_import",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        });
+        await batch.commit();
+        alert(`🎉 Sukses! ${pendingBulkAthletes.length} atlete is suksesvol in Firestore ingevoer!`);
+        pendingBulkAthletes = [];
+        document.getElementById("bulkPreviewContainer").style.display = "none";
+      } catch (err) {
+        alert("Fout met massainvoer: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "✅ Voer Alles In na Firestore";
+      }
+    }
+
+    function downloadOfficialExcelTemplate() {
+      const csvContent = 
+`LAERSKOOL SWARTLAND - INSKRYWINGSDOKUMENT (SEUNS & DOGTERS)
+Ouderdom,Voornaam,Van,Skool,50m,60m,80m,100m,150m,200m,1200m,1500m,4x100m Relay,Long Jump,High Jump,Shot Put,Discus,Javelin,70m Hurdles,75m Hurdles,80m Hurdles,150m Hurdles,200m Hurdles,1500m Walk
+13,Pieter,Smit,Laerskool Swartland,,,x,,x,,,,,,x,,,,,,,,,
+12,Johan,Botha,Laerskool Swartland,,,,x,,,,,,x,,x,,,,,,,,
+11,Lize,van Zyl,Laerskool Swartland,,x,,x,,,,,,,,,,,,,,,,
+10,Mia,du Plessis,Laerskool Swartland,,,x,,,,,,,,,,,,,,,,,,`;
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Laerskool_Swartland_Inskrywings_Sjabloon.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Sharing & Printing
     function shareWhatsAppLink() {
       const url = window.location.href;
-      const text = `🏃 *LAERSKOOL SWARTLAND - INTYDSE ATLETIEK UITSLAE* 🏃\n\nVolg die byeenkoms uitslae, medaljes en skole punte intyds hier:\n${url}\n\nUitslae word lewendig deur baan- en veldbeamptes bygewerk!`;
+      const text = currentLang === "af"
+        ? `🏃 *LAERSKOOL SWARTLAND - INTYDSE ATLETIEK UITSLAE* 🏃\n\nVolg die byeenkoms uitslae, medaljes en skole punte intyds hier:\n${url}\n\nUitslae word lewendig deur baan- en veldbeamptes bygewerk!`
+        : `🏃 *LAERSKOOL SWARTLAND - LIVE ATHLETICS MEET* 🏃\n\nFollow results, medals and school points live in real-time:\n${url}\n\nResults are updated live by the field officials!`;
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
     }
 
-    // Print preparation
+    function copyWebLink() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        alert(currentLang === "af" ? "Skakel gekopieer na knipbord!" : "Link copied to clipboard!");
+      });
+    }
+
     function prepareAndPrint(tabName) {
       switchTab(tabName);
       setTimeout(() => {
@@ -1243,10 +2044,11 @@
       }, 300);
     }
 
-    // Start listeners on page load
+    // Page Load
     window.addEventListener("DOMContentLoaded", () => {
       initRealtimeStreams();
       updateRoleUI();
+      renderEventPills();
     });
   </script>
 </body>
