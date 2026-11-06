@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -20,12 +21,20 @@ import androidx.compose.ui.unit.sp
 import com.example.swartlandathletics.data.AthleticsRepository
 import com.example.swartlandathletics.model.AppConstants
 import com.example.swartlandathletics.ui.theme.*
+import com.example.swartlandathletics.util.AppLanguage
+import com.example.swartlandathletics.util.CsvManager
+import com.example.swartlandathletics.util.L10n
+import com.example.swartlandathletics.util.LanguageManager
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LiveFeedScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val language by LanguageManager.currentLanguage.collectAsState()
+    val isEnglish = language == AppLanguage.ENGLISH
     val results by AthleticsRepository.results.collectAsState()
 
     var filterSchool by remember { mutableStateOf("Alle Skole") }
@@ -47,10 +56,10 @@ fun LiveFeedScreen(
             .fillMaxSize()
             .background(LssNavyDark)
     ) {
-        SmallTopAppBar(
+        TopAppBar(
             title = {
                 Text(
-                    text = "📊 Regstreekse Uitslae (Live Feed)",
+                    text = if (isEnglish) "📊 Live Results Feed" else "📊 Regstreekse Uitslae",
                     color = LssGold,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -58,15 +67,22 @@ fun LiveFeedScreen(
             },
             navigationIcon = {
                 IconButton(onClick = onNavigateBack, modifier = Modifier.testTag("btn_back_live_feed")) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Terug", tint = LssGold)
+                    Icon(Icons.Default.ArrowBack, contentDescription = L10n.back(language), tint = LssGold)
                 }
             },
             actions = {
-                IconButton(onClick = { /* reactive state already live */ }) {
-                    Icon(Icons.Default.Refresh, contentDescription = "Herlaai", tint = LssGold)
+                IconButton(onClick = {
+                    val csv = CsvManager.exportBulkResultsCsv(filteredResults)
+                    CsvManager.shareContent(
+                        context = context,
+                        title = "Swartland_Uitslae_Grootmaat.csv",
+                        content = csv
+                    )
+                }) {
+                    Icon(Icons.Default.Share, contentDescription = "Deel Uitslae (CSV)", tint = LssGold)
                 }
             },
-            colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = LssNavyHeader)
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = LssNavyHeader)
         )
 
         LazyColumn(
@@ -138,7 +154,7 @@ fun LiveFeedScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Default.Timer, contentDescription = null, tint = LssTextMuted, modifier = Modifier.size(48.dp))
+                            Icon(Icons.Default.PlayArrow, contentDescription = null, tint = LssTextMuted, modifier = Modifier.size(48.dp))
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 "Geen uitslae vir die huidige filter nie.",

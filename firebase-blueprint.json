@@ -1,0 +1,94 @@
+{
+  "entities": {
+    "Athlete": {
+      "title": "Athlete",
+      "description": "Registered athlete for the athletics meet",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string", "description": "First name of athlete" },
+        "lastName": { "type": "string", "description": "Last name of athlete" },
+        "school": { "type": "string", "description": "School name" },
+        "gender": { "type": "string", "description": "Gender: Seuns or Dogters" },
+        "ageGroup": { "type": "string", "description": "Age group (6 to 13)" },
+        "events": { "type": "array", "description": "List of disciplines" },
+        "userId": { "type": "string", "description": "UID of creator" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["firstName", "lastName", "school", "gender", "ageGroup", "events", "userId", "createdAt"]
+    },
+    "EventRecord": {
+      "title": "EventRecord",
+      "description": "Official athletics meet record",
+      "type": "object",
+      "properties": {
+        "eventName": { "type": "string" },
+        "gender": { "type": "string" },
+        "ageGroup": { "type": "string" },
+        "recordValue": { "type": "string" },
+        "holder": { "type": "string" },
+        "year": { "type": "integer" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["eventName", "gender", "ageGroup", "recordValue", "holder", "year", "userId", "createdAt"]
+    },
+    "EventResult": {
+      "title": "EventResult",
+      "description": "Official recorded event result",
+      "type": "object",
+      "properties": {
+        "eventName": { "type": "string" },
+        "gender": { "type": "string" },
+        "ageGroup": { "type": "string" },
+        "place": { "type": "integer" },
+        "athleteId": { "type": "string" },
+        "athleteName": { "type": "string" },
+        "school": { "type": "string" },
+        "resultValue": { "type": "string" },
+        "asaPoints": { "type": "integer" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["eventName", "gender", "ageGroup", "place", "athleteName", "school", "resultValue", "asaPoints", "userId", "createdAt"]
+    },
+    "ProgramItem": {
+      "title": "ProgramItem",
+      "description": "Meet timetable item",
+      "type": "object",
+      "properties": {
+        "itemNo": { "type": "integer" },
+        "startTime": { "type": "string" },
+        "ageGroup": { "type": "string" },
+        "gender": { "type": "string" },
+        "eventName": { "type": "string" },
+        "venue": { "type": "string" },
+        "status": { "type": "string", "enum": ["Wagtend", "Besig", "Voltooi"] },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["itemNo", "startTime", "ageGroup", "gender", "eventName", "venue", "status", "userId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/athletes/{athleteId}": {
+      "schema": "Athlete",
+      "description": "Athletes registered across participating schools"
+    },
+    "/records/{recordId}": {
+      "schema": "EventRecord",
+      "description": "Historical and current meet records"
+    },
+    "/results/{resultId}": {
+      "schema": "EventResult",
+      "description": "Official event results recorded by meet officials"
+    },
+    "/program/{programId}": {
+      "schema": "ProgramItem",
+      "description": "Event day timetable schedule and venue tracking"
+    }
+  }
+}

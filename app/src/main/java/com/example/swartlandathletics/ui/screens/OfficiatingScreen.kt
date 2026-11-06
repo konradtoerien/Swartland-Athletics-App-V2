@@ -22,7 +22,11 @@ import com.example.swartlandathletics.model.AppConstants
 import com.example.swartlandathletics.model.Athlete
 import com.example.swartlandathletics.model.EventResult
 import com.example.swartlandathletics.ui.theme.*
+import com.example.swartlandathletics.util.AppLanguage
+import com.example.swartlandathletics.util.L10n
+import com.example.swartlandathletics.util.LanguageManager
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OfficiatingScreen(
     initialEvent: String? = null,
@@ -31,6 +35,9 @@ fun OfficiatingScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val language by LanguageManager.currentLanguage.collectAsState()
+    val isEnglish = language == AppLanguage.ENGLISH
+
     val athletes by AthleticsRepository.athletes.collectAsState()
     val results by AthleticsRepository.results.collectAsState()
 
@@ -71,11 +78,11 @@ fun OfficiatingScreen(
 
     // High Jump State
     var barHeight by remember { mutableDoubleStateOf(1.10) }
-    val bestClearedHeight = remember { mutableStateMapOf<Long, Double>() }
-    val currentHeightStatus = remember { mutableStateMapOf<Long, String>() }
+    val bestClearedHeight = remember { mutableStateMapOf<String, Double>() }
+    val currentHeightStatus = remember { mutableStateMapOf<String, String>() }
 
     // Field Distances State
-    val fieldDistances = remember { mutableStateMapOf<Long, String>() }
+    val fieldDistances = remember { mutableStateMapOf<String, String>() }
 
     var feedbackMsg by remember { mutableStateOf<String?>(null) }
 
@@ -88,10 +95,10 @@ fun OfficiatingScreen(
             .fillMaxSize()
             .background(LssNavyDark)
     ) {
-        SmallTopAppBar(
+        TopAppBar(
             title = {
                 Text(
-                    text = "⏱️ Byeenkoms Beoordeling",
+                    text = if (isEnglish) "⏱️ Event Officiating" else "⏱️ Byeenkoms Beoordeling",
                     color = LssGold,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -99,10 +106,10 @@ fun OfficiatingScreen(
             },
             navigationIcon = {
                 IconButton(onClick = onNavigateBack, modifier = Modifier.testTag("btn_back_officiating")) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Terug", tint = LssGold)
+                    Icon(Icons.Default.ArrowBack, contentDescription = L10n.back(language), tint = LssGold)
                 }
             },
-            colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = LssNavyHeader)
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = LssNavyHeader)
         )
 
         LazyColumn(
@@ -168,7 +175,7 @@ fun OfficiatingScreen(
                         modifier = Modifier.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = LssGold)
+                        Icon(Icons.Default.Star, contentDescription = null, tint = LssGold)
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
@@ -340,7 +347,7 @@ fun OfficiatingScreen(
                                     modifier = Modifier.weight(1f),
                                     colors = ButtonDefaults.buttonColors(containerColor = LssNavyCardLight, contentColor = LssGold)
                                 ) {
-                                    Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text("Stoor Heat $currentHeat", fontSize = 12.sp)
                                 }
@@ -381,7 +388,7 @@ fun OfficiatingScreen(
                                     modifier = Modifier.weight(1.2f),
                                     colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader)
                                 ) {
-                                    Icon(Icons.Default.Publish, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text("Finaliseer Uitslae", fontWeight = FontWeight.Bold, fontSize = 12.sp)
                                 }
@@ -523,7 +530,7 @@ fun OfficiatingScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader)
                             ) {
-                                Icon(Icons.Default.Publish, contentDescription = null)
+                                Icon(Icons.Default.Check, contentDescription = null)
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text("Finaliseer Hoogspring Uitslae", fontWeight = FontWeight.Bold)
                             }
@@ -601,7 +608,7 @@ fun OfficiatingScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader)
                             ) {
-                                Icon(Icons.Default.Publish, contentDescription = null)
+                                Icon(Icons.Default.Check, contentDescription = null)
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text("Stoor & Rangskik Velditem", fontWeight = FontWeight.Bold)
                             }
@@ -618,7 +625,7 @@ fun OfficiatingScreen(
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = LssGold)
+                            Icon(Icons.Default.Star, contentDescription = null, tint = LssGold)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("🥇 Gepubliseerde Uitslae vir Hierdie Item", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         }

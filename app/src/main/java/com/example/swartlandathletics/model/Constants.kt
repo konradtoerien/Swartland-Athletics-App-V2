@@ -68,6 +68,47 @@ object AppConstants {
         return events
     }
 
+    // Exact order of events as on Laerskool Swartland Inskrywingsdokument (Image 1)
+    val ENTRY_SHEET_DISCIPLINES = listOf(
+        // Track
+        "50m", "60m", "80m", "100m", "150m", "200m", "1200m", "1500m", "4x100m Relay",
+        // Field
+        "Long Jump", "High Jump", "Shot Put", "Discus", "Javelin",
+        // Hurdles
+        "70m Hurdles", "75m Hurdles", "80m Hurdles", "150m Hurdles", "200m Hurdles",
+        // Walk
+        "1500m Walk"
+    )
+
+    fun normalizeDiscipline(raw: String): String {
+        val clean = raw.trim()
+        val lower = clean.lowercase().replace(" ", "")
+        return when {
+            lower == "50m" -> "50m"
+            lower == "60m" -> "60m"
+            lower == "80m" -> "80m"
+            lower == "100m" -> "100m"
+            lower == "150m" -> "150m"
+            lower == "200m" -> "200m"
+            lower == "800m" -> "800m"
+            lower == "1200m" -> "1200m"
+            lower == "1500m" -> "1500m"
+            lower.contains("relay") || lower.contains("aflos") || lower.contains("4x100") -> "4x100m Relay"
+            lower.contains("verspring") || lower.contains("longjump") -> "Long Jump"
+            lower.contains("hoogspring") || lower.contains("highjump") -> "High Jump"
+            lower.contains("gewigstoot") || lower.contains("shotput") || lower.contains("shot") -> "Shot Put"
+            lower.contains("diskus") || lower.contains("discus") -> "Discus"
+            lower.contains("spiesgooi") || lower.contains("javelin") || lower.contains("spies") -> "Javelin"
+            lower.contains("70") && (lower.contains("hekkie") || lower.contains("hurdle")) -> "70m Hurdles"
+            lower.contains("75") && (lower.contains("hekkie") || lower.contains("hurdle")) -> "75m Hurdles"
+            lower.contains("80") && (lower.contains("hekkie") || lower.contains("hurdle")) -> "80m Hurdles"
+            lower.contains("150") && (lower.contains("hekkie") || lower.contains("hurdle")) -> "150m Hurdles"
+            lower.contains("200") && (lower.contains("hekkie") || lower.contains("hurdle")) -> "200m Hurdles"
+            lower.contains("stap") || lower.contains("walk") -> "1500m Walk"
+            else -> clean
+        }
+    }
+
     fun isTrackEvent(eventName: String): Boolean {
         val lower = eventName.lowercase()
         val isField = lower.contains("jump") || lower.contains("put") || lower.contains("discus") || lower.contains("javelin")

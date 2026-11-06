@@ -1,62 +1,68 @@
 package com.example.swartlandathletics.model
 
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.IgnoreExtraProperties
+import com.google.firebase.firestore.ServerTimestamp
+
+@IgnoreExtraProperties
 data class Athlete(
-    val id: Long,
-    val firstName: String,
-    val lastName: String,
-    val school: String,
-    val gender: String, // "Seuns" or "Dogters"
-    val ageGroup: String, // "6".."13"
-    val events: List<String>
+    @DocumentId val id: String = "",
+    val firstName: String = "",
+    val lastName: String = "",
+    val school: String = "",
+    val gender: String = "Seuns", // "Seuns" or "Dogters"
+    val ageGroup: String = "13", // "6".."13"
+    val events: List<String> = emptyList(),
+    val userId: String = "",
+    @ServerTimestamp val createdAt: Timestamp? = null,
+    @ServerTimestamp val updatedAt: Timestamp? = null
 ) {
-    val fullName: String get() = "$firstName $lastName"
+    val fullName: String get() = "$firstName $lastName".trim()
 }
 
+@IgnoreExtraProperties
 data class EventRecord(
-    val id: Long,
-    val eventName: String,
-    val gender: String,
-    val ageGroup: String,
-    val recordValue: String,
-    val holder: String,
-    val year: Int
+    @DocumentId val id: String = "",
+    val eventName: String = "",
+    val gender: String = "Seuns",
+    val ageGroup: String = "13",
+    val recordValue: String = "",
+    val holder: String = "",
+    val year: Int = 2024,
+    val userId: String = "",
+    @ServerTimestamp val createdAt: Timestamp? = null,
+    @ServerTimestamp val updatedAt: Timestamp? = null
 )
 
+@IgnoreExtraProperties
 data class EventResult(
-    val id: Long = 0,
-    val eventName: String,
-    val gender: String,
-    val ageGroup: String,
-    val place: Int,
-    val athleteId: Long,
-    val athleteName: String,
-    val school: String,
-    val resultValue: String,
-    val asaPoints: Int,
-    val timestamp: Long = System.currentTimeMillis()
+    @DocumentId val id: String = "",
+    val eventName: String = "",
+    val gender: String = "Seuns",
+    val ageGroup: String = "13",
+    val place: Int = 1,
+    val athleteId: String = "",
+    val athleteName: String = "",
+    val school: String = "",
+    val resultValue: String = "",
+    val asaPoints: Int = 0,
+    val userId: String = "",
+    @ServerTimestamp val createdAt: Timestamp? = null,
+    @ServerTimestamp val updatedAt: Timestamp? = null
 )
 
+@IgnoreExtraProperties
 data class ProgramItem(
-    val id: Long,
-    val itemNo: Int,
-    val startTime: String,
-    val ageGroup: String,
-    val gender: String,
-    val eventName: String,
-    val venue: String,
-    val status: String = "Wagtend" // "Wagtend", "Besig", "Voltooi"
-)
-
-data class HeatEntry(
-    val place: Int,
-    val time: String,
-    val athlete: Athlete?
-)
-
-data class HighJumpAttempt(
-    val athleteId: Long,
-    val athleteName: String,
-    val school: String,
-    val status: String, // "O (Slaag)", "X (Misluk)", "P (Pass)"
-    val height: Double
+    @DocumentId val id: String = "",
+    val itemNo: Int = 1,
+    val startTime: String = "",
+    val ageGroup: String = "13",
+    val gender: String = "Seuns",
+    val eventName: String = "",
+    val venue: String = "",
+    val status: String = "Wagtend", // "Wagtend", "Besig", "Voltooi"
+    val userId: String = "",
+    @ServerTimestamp val createdAt: Timestamp? = null,
+    @ServerTimestamp val updatedAt: Timestamp? = null
 )

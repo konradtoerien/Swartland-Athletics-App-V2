@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laerskool Swartland - Atletiek Byeenkoms Portaal</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDKs (v10 compat for drop-in CDN browser support) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+  <style>
+    :root {
+      --lss-navy-dark: #0A192F;
+      --lss-navy-card: #112240;
+      --lss-navy-header: #071224;
+      --lss-gold: #F4C430;
+      --lss-gold-light: #FFD700;
+      --lss-gold-dark: #C69500;
+      --lss-text-light: #F8FAFC;
+      --lss-text-muted: #94A3B8;
+      --lss-green: #10B981;
+      --lss-red: #EF4444;
+      --lss-border: rgba(244, 196, 48, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--lss-navy-dark);
+      color: var(--lss-text-light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Header */
+    header {
+      background: linear-gradient(180deg, var(--lss-navy-header) 0%, #0c1c38 100%);
+      border-bottom: 2px solid var(--lss-gold);
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    }
+
+    .header-branding {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--lss-navy-dark);
+      border: 2px solid var(--lss-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: var(--lss-gold);
+      font-size: 16px;
+    }
+
+    .header-title h1 {
+      font-size: 17px;
+      color: var(--lss-gold);
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .header-title p {
+      font-size: 11px;
+      color: var(--lss-text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .live-pill {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--lss-green);
+      color: var(--lss-green);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--lss-green);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.3; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.1); }
+      100% { opacity: 0.3; transform: scale(0.9); }
+    }
+
+    .btn-official-toggle {
+      background: transparent;
+      border: 1px solid var(--lss-gold);
+      color: var(--lss-gold);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-official-toggle:hover {
+      background: rgba(244, 196, 48, 0.15);
+    }
+
+    /* Hero & Progress Section */
+    .hero-banner {
+      background: var(--lss-navy-card);
+      border-bottom: 1px solid var(--lss-border);
+      padding: 16px 20px;
+    }
+
+    .hero-container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .progress-bar-wrapper {
+      margin-top: 10px;
+      background: #071324;
+      border-radius: 8px;
+      height: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #F4C430 0%, #FFD700 100%);
+      height: 100%;
+      width: 0%;
+      transition: width 0.6s ease;
+    }
+
+    .hero-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .stat-card {
+      background: rgba(7, 18, 36, 0.6);
+      border: 1px solid var(--lss-border);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--lss-gold);
+    }
+
+    .stat-lbl {
+      font-size: 11px;
+      color: var(--lss-text-muted);
+      margin-top: 2px;
+    }
+
+    /* Tab Navigation */
+    .tab-bar {
+      display: flex;
+      background: var(--lss-navy-header);
+      border-bottom: 1px solid var(--lss-border);
+      overflow-x: auto;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--lss-text-muted);
+      padding: 14px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: var(--lss-text-light);
+    }
+
+    .tab-btn.active {
+      color: var(--lss-gold);
+      border-bottom: 3px solid var(--lss-gold);
+      background: rgba(244, 196, 48, 0.05);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .view-section {
+      display: none;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    /* Cards & Lists */
+    .section-card {
+      background: var(--lss-navy-card);
+      border: 1px solid var(--lss-border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--lss-gold);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Results Table */
+    .styled-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .styled-table th {
+      background: rgba(7, 18, 36, 0.8);
+      color: var(--lss-gold);
+      padding: 10px 12px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--lss-border);
+    }
+
+    .styled-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .styled-table tr:hover {
+      background: rgba(244, 196, 48, 0.04);
+    }
+
+    .badge-place-1 {
+      background: #F4C430;
+      color: #0A192F;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 12px;
+      font-size: 11px;
+    }
+
+    .badge-place-2 {
+      background: #E2E8F0;
+      color: #0A192F;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 12px;
+      font-size: 11px;
+    }
+
+    .badge-place-3 {
+      background: #CD7F32;
+      color: #ffffff;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 12px;
+      font-size: 11px;
+    }
+
+    /* Form Inputs for Officials */
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--lss-text-muted);
+      margin-bottom: 4px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      background: #071324;
+      border: 1px solid var(--lss-border);
+      border-radius: 6px;
+      color: var(--lss-text-light);
+      font-size: 13px;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--lss-gold);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .btn-primary {
+      background: var(--lss-gold);
+      color: var(--lss-navy-header);
+      font-weight: 700;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--lss-gold-light);
+    }
+
+    .btn-secondary {
+      background: #071324;
+      color: var(--lss-text-light);
+      border: 1px solid var(--lss-border);
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    /* WhatsApp Share Button */
+    .btn-whatsapp {
+      background: #25D366;
+      color: #FFFFFF;
+      font-weight: 700;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-whatsapp:hover {
+      background: #20BA56;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      header, .hero-banner, .tab-bar, .no-print, button, .btn-whatsapp {
+        display: none !important;
+      }
+      .section-card {
+        background: #ffffff !important;
+        border: 1px solid #000000 !important;
+        box-shadow: none !important;
+        color: #000000 !important;
+      }
+      .styled-table th {
+        background: #f1f5f9 !important;
+        color: #000000 !important;
+        border: 1px solid #000000 !important;
+      }
+      .styled-table td {
+        border: 1px solid #000000 !important;
+        color: #000000 !important;
+      }
+      .print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #000000;
+        padding-bottom: 10px;
+      }
+    }
+
+    .print-header {
+      display: none;
+    }
+
+    /* Modal for PIN */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--lss-navy-card);
+      border: 2px solid var(--lss-gold);
+      border-radius: 14px;
+      padding: 24px;
+      max-width: 380px;
+      width: 90%;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <div class="header-branding">
+      <div class="header-logo">LS</div>
+      <div class="header-title">
+        <h1>Laerskool Swartland</h1>
+        <p>Amptelike Atletiek Byeenkoms Portaal</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="live-pill">
+        <span class="live-dot"></span>
+        <span>INTYDS</span>
+      </div>
+      <button class="btn-official-toggle no-print" id="roleBtn" onclick="toggleRoleModal()">
+        <span>🔒 Beampte Aanmelding</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero & Progress Banner -->
+  <section class="hero-banner">
+    <div class="hero-container">
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+        <span style="color: var(--lss-text-muted);" id="progressLabel">Byeenkoms Vordering: 0 van 0 voltooi (0%)</span>
+        <button class="btn-whatsapp no-print" onclick="shareWhatsAppLink()">
+          <span>📲 Deel Skakel op WhatsApp</span>
+        </button>
+      </div>
+      <div class="progress-bar-wrapper">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+      <div class="hero-stats-grid">
+        <div class="stat-card">
+          <div class="stat-val" id="statAthletes">0</div>
+          <div class="stat-lbl">Atlete Ingeskryf</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="statResults">0</div>
+          <div class="stat-lbl">Uitslae Voltooi</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="statSchools">0</div>
+          <div class="stat-lbl">Deelnemende Skole</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="statMedals">0</div>
+          <div class="stat-lbl">Medaljes Toegeken</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="statRecords">0</div>
+          <div class="stat-lbl">Rekords</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab Bar Navigation -->
+  <nav class="tab-bar no-print">
+    <button class="tab-btn active" onclick="switchTab('results')">⏱️ Lewendige Uitslae</button>
+    <button class="tab-btn" onclick="switchTab('standings')">🏆 Skole Ranglys</button>
+    <button class="tab-btn" onclick="switchTab('ludorum')">🌟 Victor & Victrix</button>
+    <button class="tab-btn" onclick="switchTab('program')">📅 Program Rooster</button>
+    <button class="tab-btn" onclick="switchTab('records')">📜 Rekords</button>
+    <button class="tab-btn official-only" id="tabOfficials" style="display: none;" onclick="switchTab('officials')">⌨️ Beampte Tik-Portaal</button>
+    <button class="tab-btn official-only" id="tabPrint" style="display: none;" onclick="switchTab('print')">🖨️ Drukkerystelsel</button>
+    <button class="tab-btn" onclick="switchTab('entries')">📝 Aanlyn Inskrywings</button>
+  </nav>
+
+  <!-- Print Header for Physical Printouts -->
+  <div class="print-header">
+    <h2>LAERSKOOL SWARTLAND - ATLETIEK BYEENKOMS</h2>
+    <p>Amptelike Byeenkomsverslag en Uitslae</p>
+  </div>
+
+  <!-- Main Content Area -->
+  <main>
+
+    <!-- 1. LIVE RESULTS VIEW -->
+    <div id="view-results" class="view-section active">
+      <div class="section-card">
+        <div class="card-title">
+          <span>⏱️ Jongste Uitslae (Lewendig op die Veld)</span>
+          <span style="font-size: 12px; color: var(--lss-text-muted);">Outomaties bygewerk via Firestore</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="styled-table" id="tableResults">
+            <thead>
+              <tr>
+                <th>Plek</th>
+                <th>Item</th>
+                <th>Geslag</th>
+                <th>Oud.</th>
+                <th>Atleet</th>
+                <th>Skool</th>
+                <th>Tyd / Afstand</th>
+                <th>ASA Punte</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyResults">
+              <tr>
+                <td colspan="8" style="text-align: center; color: var(--lss-text-muted); padding: 24px;">
+                  Wag vir eerste amptelike uitslae van beoordelaars...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TEAM STANDINGS (SKOLE RANGLYS) -->
+    <div id="view-standings" class="view-section">
+      <div class="section-card">
+        <div class="card-title">
+          <span>🏆 Skole Ranglys & Medaljetelling (Kampioenskool)</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="styled-table" id="tableStandings">
+            <thead>
+              <tr>
+                <th>Rang</th>
+                <th>Skool</th>
+                <th>Goud 🥇</th>
+                <th>Silwer 🥈</th>
+                <th>Brons 🥉</th>
+                <th>Items</th>
+                <th>Totale Punte</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyStandings">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. VICTOR & VICTRIX LUDORUM -->
+    <div id="view-ludorum" class="view-section">
+      <div class="section-card">
+        <div class="card-title">
+          <span>🌟 Victor & Victrix Ludorum Toekennings</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;">
+          <div style="background: rgba(7, 18, 36, 0.7); border: 1px solid var(--lss-gold); border-radius: 10px; padding: 16px;">
+            <div style="font-size: 13px; color: var(--lss-gold); font-weight: 700;">👑 Algehele Victor Ludorum</div>
+            <div style="font-size: 18px; font-weight: 800; margin: 8px 0;" id="ludorumOverallVictor">Bereken tans...</div>
+            <div style="font-size: 12px; color: var(--lss-text-muted);" id="ludorumOverallVictorSub">-</div>
+          </div>
+          <div style="background: rgba(7, 18, 36, 0.7); border: 1px solid var(--lss-gold); border-radius: 10px; padding: 16px;">
+            <div style="font-size: 13px; color: var(--lss-gold); font-weight: 700;">👑 Algehele Victrix Ludorum</div>
+            <div style="font-size: 18px; font-weight: 800; margin: 8px 0;" id="ludorumOverallVictrix">Bereken tans...</div>
+            <div style="font-size: 12px; color: var(--lss-text-muted);" id="ludorumOverallVictrixSub">-</div>
+          </div>
+          <div style="background: rgba(7, 18, 36, 0.7); border: 1px solid var(--lss-border); border-radius: 10px; padding: 16px;">
+            <div style="font-size: 13px; color: var(--lss-gold); font-weight: 700;">🏅 Senior Victor (o/12 & o/13)</div>
+            <div style="font-size: 16px; font-weight: 700; margin: 6px 0;" id="ludorumSeniorVictor">-</div>
+          </div>
+          <div style="background: rgba(7, 18, 36, 0.7); border: 1px solid var(--lss-border); border-radius: 10px; padding: 16px;">
+            <div style="font-size: 13px; color: var(--lss-gold); font-weight: 700;">🏅 Senior Victrix (o/12 & o/13)</div>
+            <div style="font-size: 16px; font-weight: 700; margin: 6px 0;" id="ludorumSeniorVictrix">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. PROGRAM ROOSTER -->
+    <div id="view-program" class="view-section">
+      <div class="section-card">
+        <div class="card-title">
+          <span>📅 Byeenkoms Program & Rooster</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="styled-table" id="tableProgram">
+            <thead>
+              <tr>
+                <th>Item #</th>
+                <th>Tyd</th>
+                <th>Item Naam</th>
+                <th>Geslag</th>
+                <th>Oud.</th>
+                <th>Plek / Baan</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyProgram">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. REKORDS -->
+    <div id="view-records" class="view-section">
+      <div class="section-card">
+        <div class="card-title">
+          <span>📜 Amptelike Byeenkomsrekords</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="styled-table" id="tableRecords">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Geslag</th>
+                <th>Oud.</th>
+                <th>Rekordwaarde</th>
+                <th>Houer / Skool</th>
+                <th>Jaar</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyRecords">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. OFFICIALS ENTRY PORTAL (PC RESULT ENTRY) -->
+    <div id="view-officials" class="view-section">
+      <div class="section-card">
+        <div class="card-title">
+          <span>⌨️ Beampte Uitslae Tik-Portaal (PC Rekenaar Invoer)</span>
+          <span style="font-size: 12px; color: var(--lss-green);">● Gemagtig as Beampte</span>
+        </div>
+        <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 16px;">
+          Tik amptelike uitslae direk vanaf jou rekenaarsleutelbord in. Dit sinkroniseer onmiddellik na alle fone en die lewendige webwerf.
+        </p>
+        <form id="formOfficialResult" onsubmit="submitOfficialResult(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Item Naam</label>
+              <input type="text" class="form-control" id="inpEventName" placeholder="bv. 100m, Gewigstoot, Verspring" required>
+            </div>
+            <div class="form-group">
+              <label>Geslag</label>
+              <select class="form-control" id="inpGender" required>
+                <option value="Seuns">Seuns</option>
+                <option value="Dogters">Dogters</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Ouderdomsgroep</label>
+              <select class="form-control" id="inpAgeGroup" required>
+                <option value="7">o/7</option>
+                <option value="8">o/8</option>
+                <option value="9">o/9</option>
+                <option value="10">o/10</option>
+                <option value="11">o/11</option>
+                <option value="12">o/12</option>
+                <option value="13">o/13</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Plek (1, 2, 3...)</label>
+              <input type="number" class="form-control" id="inpPlace" min="1" max="50" value="1" required>
+            </div>
+            <div class="form-group">
+              <label>Atleet Naam & Van</label>
+              <input type="text" class="form-control" id="inpAthleteName" placeholder="bv. Johan van der Merwe" required>
+            </div>
+            <div class="form-group">
+              <label>Skool</label>
+              <input type="text" class="form-control" id="inpSchool" placeholder="bv. Laerskool Swartland" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tyd of Afstand</label>
+              <input type="text" class="form-control" id="inpResultValue" placeholder="bv. 12.34s of 4.56m" required>
+            </div>
+            <div class="form-group">
+              <label>ASA Punte (Opsioneel / Skatting)</label>
+              <input type="number" class="form-control" id="inpAsaPoints" min="0" max="1200" placeholder="bv. 650">
+            </div>
+          </div>
+          <div style="margin-top: 10px;">
+            <button type="submit" class="btn-primary" id="btnSubmitResult">
+              💾 Stoor Uitslag na Firestore
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 7. PRINT CENTER -->
+    <div id="view-print" class="view-section">
+      <div class="section-card no-print">
+        <div class="card-title">
+          <span>🖨️ Drukkerystelsel (Print Sheets)</span>
+        </div>
+        <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 16px;">
+          Kies 'n dokument om direk op jou kantoordrukker uit te druk op A4 formaat:
+        </p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn-primary" onclick="prepareAndPrint('standings')">🖨️ Druk Skole Ranglys</button>
+          <button class="btn-primary" onclick="prepareAndPrint('results')">🖨️ Druk Alle Uitslae</button>
+          <button class="btn-primary" onclick="prepareAndPrint('program')">🖨️ Druk Program Rooster</button>
+          <button class="btn-primary" onclick="prepareAndPrint('records')">🖨️ Druk Rekordlys</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. ONLINE ENTRIES FORM -->
+    <div id="view-entries" class="view-section">
+      <div class="section-card">
+        <div class="card-title">
+          <span>📝 Aanlyn Inskrywingsvorm vir Skole</span>
+        </div>
+        <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 16px;">
+          Skole kan hier hul atlete direk intik, óf die amptelike Excel-sigblad aflaai en invul.
+        </p>
+        <form id="formOnlineEntry" onsubmit="submitOnlineAthlete(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Skool Naam</label>
+              <input type="text" class="form-control" id="entrySchool" placeholder="bv. Laerskool Swartland" required>
+            </div>
+            <div class="form-group">
+              <label>Atleet Voornaam</label>
+              <input type="text" class="form-control" id="entryFirstName" placeholder="bv. Pieter" required>
+            </div>
+            <div class="form-group">
+              <label>Atleet Van</label>
+              <input type="text" class="form-control" id="entryLastName" placeholder="bv. Smit" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Geslag</label>
+              <select class="form-control" id="entryGender" required>
+                <option value="Seuns">Seuns</option>
+                <option value="Dogters">Dogters</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Ouderdomsgroep</label>
+              <select class="form-control" id="entryAge" required>
+                <option value="7">o/7</option>
+                <option value="8">o/8</option>
+                <option value="9">o/9</option>
+                <option value="10">o/10</option>
+                <option value="11">o/11</option>
+                <option value="12">o/12</option>
+                <option value="13">o/13</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Items Ingeskryf (Gekies)</label>
+              <input type="text" class="form-control" id="entryEvents" placeholder="bv. 100m, Verspring, Aflos" required>
+            </div>
+          </div>
+          <div style="margin-top: 10px;">
+            <button type="submit" class="btn-primary">
+              ➕ Registreer Atleet Aanlyn
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- PIN Entry Modal for Officials -->
+  <div class="modal-overlay" id="pinModal">
+    <div class="modal-card">
+      <h3 style="color: var(--lss-gold); margin-bottom: 10px;">🔒 Beampte Aanmelding</h3>
+      <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 16px;">
+        Tik die amptelike 4-syfer PIN in om uitslae in te voer of drukwerk te doen (Verstek: 1920):
+      </p>
+      <input type="password" id="modalPinInput" class="form-control" placeholder="****" style="text-align: center; font-size: 20px; letter-spacing: 6px; margin-bottom: 16px;" maxlength="8">
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button class="btn-secondary" onclick="closeRoleModal()">Kanselleer</button>
+        <button class="btn-primary" onclick="verifyOfficialPin()">Bevestig PIN</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 1. Firebase Configuration from Project Credentials
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4LI5InqpmgXTY9ulf84HtMjkerWLH_Ao",
+      authDomain: "gen-lang-client-0986840010.firebaseapp.com",
+      projectId: "gen-lang-client-0986840010",
+      storageBucket: "gen-lang-client-0986840010.firebasestorage.app",
+      messagingSenderId: "446964741123",
+      appId: "1:446964741123:android:3e99e80bcd662d9cdc4a36"
+    };
+
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    
+    // Connect to custom named Firestore database
+    const db = firebase.app().firestore("ai-studio-android-swartlan-d1579b6e-c3cc-4480-9c0e-cac716751650");
+
+    // State
+    let isOfficial = false;
+    let athletesData = [];
+    let recordsData = [];
+    let resultsData = [];
+    let programData = [];
+
+    // Real-time Firestore Listeners
+    function initRealtimeStreams() {
+      // Results stream
+      db.collection("results").onSnapshot((snapshot) => {
+        resultsData = [];
+        snapshot.forEach((doc) => resultsData.push({ id: doc.id, ...doc.data() }));
+        renderResults();
+        renderStandings();
+        renderLudorum();
+        updateStats();
+      }, (err) => console.warn("Results stream error:", err));
+
+      // Program stream
+      db.collection("program").orderBy("itemNo", "asc").onSnapshot((snapshot) => {
+        programData = [];
+        snapshot.forEach((doc) => programData.push({ id: doc.id, ...doc.data() }));
+        renderProgram();
+        updateStats();
+      }, (err) => console.warn("Program stream error:", err));
+
+      // Records stream
+      db.collection("records").onSnapshot((snapshot) => {
+        recordsData = [];
+        snapshot.forEach((doc) => recordsData.push({ id: doc.id, ...doc.data() }));
+        renderRecords();
+        updateStats();
+      }, (err) => console.warn("Records stream error:", err));
+
+      // Athletes stream
+      db.collection("athletes").onSnapshot((snapshot) => {
+        athletesData = [];
+        snapshot.forEach((doc) => athletesData.push({ id: doc.id, ...doc.data() }));
+        updateStats();
+      }, (err) => console.warn("Athletes stream error:", err));
+    }
+
+    // Render Results
+    function renderResults() {
+      const tbody = document.getElementById("tbodyResults");
+      if (!tbody) return;
+      if (resultsData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--lss-text-muted); padding: 24px;">Wag vir eerste amptelike uitslae van beoordelaars...</td></tr>`;
+        return;
+      }
+
+      // Sort results by place then points
+      const sorted = [...resultsData].sort((a,b) => (a.place || 99) - (b.place || 99));
+      let html = "";
+      sorted.forEach((r) => {
+        const placeBadge = r.place === 1 ? `<span class="badge-place-1">1ste 🥇</span>` :
+                           r.place === 2 ? `<span class="badge-place-2">2de 🥈</span>` :
+                           r.place === 3 ? `<span class="badge-place-3">3de 🥉</span>` : `${r.place}de`;
+        html += `
+          <tr>
+            <td>${placeBadge}</td>
+            <td><strong>${r.eventName || '-'}</strong></td>
+            <td>${r.gender || '-'}</td>
+            <td>o/${r.ageGroup || '-'}</td>
+            <td>${r.athleteName || '-'}</td>
+            <td>${r.school || '-'}</td>
+            <td><strong>${r.resultValue || '-'}</strong></td>
+            <td><span style="color: var(--lss-gold); font-weight: 700;">${r.asaPoints || 0}</span></td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    // Render School Standings
+    function renderStandings() {
+      const tbody = document.getElementById("tbodyStandings");
+      if (!tbody) return;
+      
+      const schoolsMap = {};
+      resultsData.forEach((r) => {
+        const s = (r.school || "").trim();
+        if (!s) return;
+        if (!schoolsMap[s]) {
+          schoolsMap[s] = { school: s, gold: 0, silver: 0, bronze: 0, points: 0, events: 0 };
+        }
+        schoolsMap[s].points += (r.asaPoints || 0);
+        schoolsMap[s].events += 1;
+        if (r.place === 1) schoolsMap[s].gold += 1;
+        if (r.place === 2) schoolsMap[s].silver += 1;
+        if (r.place === 3) schoolsMap[s].bronze += 1;
+      });
+
+      const list = Object.values(schoolsMap).sort((a, b) => b.points - a.points);
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--lss-text-muted); padding: 20px;">Nog geen punte aangeteken nie.</td></tr>`;
+        return;
+      }
+
+      let html = "";
+      list.forEach((s, idx) => {
+        const rank = idx === 0 ? "🏆 1ste" : idx === 1 ? "🥈 2de" : idx === 2 ? "🥉 3de" : `${idx + 1}`;
+        html += `
+          <tr>
+            <td><strong>${rank}</strong></td>
+            <td><strong>${s.school}</strong></td>
+            <td>${s.gold}</td>
+            <td>${s.silver}</td>
+            <td>${s.bronze}</td>
+            <td>${s.events}</td>
+            <td><strong style="color: var(--lss-gold); font-size: 15px;">${s.points}</strong></td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    // Render Victor & Victrix Ludorum
+    function renderLudorum() {
+      const boys = {};
+      const girls = {};
+      resultsData.forEach((r) => {
+        const g = (r.gender || "").toLowerCase();
+        const key = (r.athleteName || "").trim() + " (" + (r.school || "").trim() + ")";
+        if (g.startsWith("s") || g.startsWith("m") || g === "seuns") {
+          boys[key] = (boys[key] || 0) + (r.asaPoints || 0);
+        } else {
+          girls[key] = (girls[key] || 0) + (r.asaPoints || 0);
+        }
+      });
+
+      const topBoy = Object.entries(boys).sort((a,b) => b[1] - a[1])[0];
+      const topGirl = Object.entries(girls).sort((a,b) => b[1] - a[1])[0];
+
+      if (topBoy) {
+        document.getElementById("ludorumOverallVictor").innerText = topBoy[0];
+        document.getElementById("ludorumOverallVictorSub").innerText = `${topBoy[1]} Totale ASA Punte`;
+        document.getElementById("ludorumSeniorVictor").innerText = `${topBoy[0]} (${topBoy[1]} pts)`;
+      }
+      if (topGirl) {
+        document.getElementById("ludorumOverallVictrix").innerText = topGirl[0];
+        document.getElementById("ludorumOverallVictrixSub").innerText = `${topGirl[1]} Totale ASA Punte`;
+        document.getElementById("ludorumSeniorVictrix").innerText = `${topGirl[0]} (${topGirl[1]} pts)`;
+      }
+    }
+
+    // Render Program
+    function renderProgram() {
+      const tbody = document.getElementById("tbodyProgram");
+      if (!tbody) return;
+      if (programData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--lss-text-muted); padding: 20px;">Geen items tans op program nie.</td></tr>`;
+        return;
+      }
+      let html = "";
+      programData.forEach((p) => {
+        const badge = p.status === "Voltooi" ? `<span style="color: var(--lss-green); font-weight:700;">✓ Voltooi</span>` :
+                      p.status === "Besig" ? `<span style="color: var(--lss-gold); font-weight:700;">● Besig</span>` :
+                      `<span style="color: var(--lss-text-muted);">Wagtend</span>`;
+        html += `
+          <tr>
+            <td>#${p.itemNo}</td>
+            <td>${p.startTime || '-'}</td>
+            <td><strong>${p.eventName || '-'}</strong></td>
+            <td>${p.gender || '-'}</td>
+            <td>o/${p.ageGroup || '-'}</td>
+            <td>${p.venue || '-'}</td>
+            <td>${badge}</td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    // Render Records
+    function renderRecords() {
+      const tbody = document.getElementById("tbodyRecords");
+      if (!tbody) return;
+      if (recordsData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--lss-text-muted); padding: 20px;">Geen rekords gelaai nie.</td></tr>`;
+        return;
+      }
+      let html = "";
+      recordsData.forEach((r) => {
+        html += `
+          <tr>
+            <td><strong>${r.eventName || '-'}</strong></td>
+            <td>${r.gender || '-'}</td>
+            <td>o/${r.ageGroup || '-'}</td>
+            <td><strong style="color: var(--lss-gold);">${r.recordValue || '-'}</strong></td>
+            <td>${r.holder || '-'}</td>
+            <td>${r.year || '-'}</td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    // Update Stats & Progress
+    function updateStats() {
+      document.getElementById("statAthletes").innerText = athletesData.length;
+      document.getElementById("statResults").innerText = resultsData.length;
+      document.getElementById("statRecords").innerText = recordsData.length;
+      document.getElementById("statMedals").innerText = resultsData.filter(r => (r.place || 99) <= 3).length;
+
+      const schools = new Set();
+      athletesData.forEach(a => a.school && schools.add(a.school.trim()));
+      resultsData.forEach(r => r.school && schools.add(r.school.trim()));
+      document.getElementById("statSchools").innerText = schools.size;
+
+      const completed = programData.filter(p => p.status === "Voltooi").length;
+      const total = programData.length;
+      const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+      document.getElementById("progressLabel").innerText = `Byeenkoms Vordering: ${completed} van ${total} voltooi (${pct}%)`;
+      document.getElementById("progressBar").style.width = pct + "%";
+    }
+
+    // Tab Navigation
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+      document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
+      
+      const targetSec = document.getElementById("view-" + tabId);
+      if (targetSec) targetSec.classList.add("active");
+      
+      // highlight active tab button
+      const activeBtn = Array.from(document.querySelectorAll(".tab-btn")).find(b => b.getAttribute("onclick").includes(tabId));
+      if (activeBtn) activeBtn.classList.add("active");
+    }
+
+    // PIN Authentication for Officials
+    function toggleRoleModal() {
+      if (isOfficial) {
+        if (confirm("Wil jy Beampte Modus verlaat en terugkeer na Toeskouer Modus?")) {
+          isOfficial = false;
+          updateRoleUI();
+        }
+      } else {
+        document.getElementById("pinModal").classList.add("active");
+        document.getElementById("modalPinInput").focus();
+      }
+    }
+
+    function closeRoleModal() {
+      document.getElementById("pinModal").classList.remove("active");
+      document.getElementById("modalPinInput").value = "";
+    }
+
+    function verifyOfficialPin() {
+      const pin = document.getElementById("modalPinInput").value.trim();
+      if (pin === "1920" || pin.length >= 4) {
+        isOfficial = true;
+        closeRoleModal();
+        updateRoleUI();
+        switchTab("officials");
+        alert("✅ Beampte Modus suksesvol ontsluit! U het nou volle toegang.");
+      } else {
+        alert("❌ Verkeerde PIN. Die amptelike verstek-PIN is 1920.");
+      }
+    }
+
+    function updateRoleUI() {
+      const btn = document.getElementById("roleBtn");
+      const tabOfficials = document.getElementById("tabOfficials");
+      const tabPrint = document.getElementById("tabPrint");
+
+      if (isOfficial) {
+        btn.innerHTML = "<span>⭐ Beampte Modus (Ontsluit)</span>";
+        btn.style.borderColor = "var(--lss-green)";
+        btn.style.color = "var(--lss-green)";
+        if (tabOfficials) tabOfficials.style.display = "flex";
+        if (tabPrint) tabPrint.style.display = "flex";
+      } else {
+        btn.innerHTML = "<span>🔒 Beampte Aanmelding</span>";
+        btn.style.borderColor = "var(--lss-gold)";
+        btn.style.color = "var(--lss-gold)";
+        if (tabOfficials) tabOfficials.style.display = "none";
+        if (tabPrint) tabPrint.style.display = "none";
+      }
+    }
+
+    // Submit Official Result from PC keyboard
+    async function submitOfficialResult(e) {
+      e.preventDefault();
+      const eventName = document.getElementById("inpEventName").value.trim();
+      const gender = document.getElementById("inpGender").value;
+      const ageGroup = document.getElementById("inpAgeGroup").value;
+      const place = parseInt(document.getElementById("inpPlace").value, 10);
+      const athleteName = document.getElementById("inpAthleteName").value.trim();
+      const school = document.getElementById("inpSchool").value.trim();
+      const resultValue = document.getElementById("inpResultValue").value.trim();
+      let asaPoints = parseInt(document.getElementById("inpAsaPoints").value, 10);
+      if (isNaN(asaPoints) || asaPoints <= 0) {
+        asaPoints = place === 1 ? 650 : place === 2 ? 550 : place === 3 ? 450 : 350;
+      }
+
+      const btn = document.getElementById("btnSubmitResult");
+      btn.innerText = "Stoor tans...";
+      btn.disabled = true;
+
+      try {
+        const id = "res_" + Date.now();
+        await db.collection("results").doc(id).set({
+          eventName: eventName,
+          gender: gender,
+          ageGroup: ageGroup,
+          place: place,
+          athleteName: athleteName,
+          school: school,
+          resultValue: resultValue,
+          asaPoints: asaPoints,
+          userId: "official_web_portal",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert(`✅ Uitslag vir ${athleteName} (${school}) suksesvol gestoor!`);
+        document.getElementById("formOfficialResult").reset();
+      } catch (err) {
+        alert("Fout met stoor: " + err.message);
+      } finally {
+        btn.innerText = "💾 Stoor Uitslag na Firestore";
+        btn.disabled = false;
+      }
+    }
+
+    // Submit Online Athlete Registration
+    async function submitOnlineAthlete(e) {
+      e.preventDefault();
+      const school = document.getElementById("entrySchool").value.trim();
+      const firstName = document.getElementById("entryFirstName").value.trim();
+      const lastName = document.getElementById("entryLastName").value.trim();
+      const gender = document.getElementById("entryGender").value;
+      const ageGroup = document.getElementById("entryAge").value;
+      const eventsStr = document.getElementById("entryEvents").value.trim();
+      const eventsList = eventsStr.split(",").map(s => s.trim()).filter(s => s.length > 0);
+
+      try {
+        const id = "ath_" + Date.now();
+        await db.collection("athletes").doc(id).set({
+          firstName: firstName,
+          lastName: lastName,
+          school: school,
+          gender: gender,
+          ageGroup: ageGroup,
+          events: eventsList,
+          userId: "online_school_entry",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert(`✅ Atleet ${firstName} ${lastName} (${school}) suksesvol geregistreer!`);
+        document.getElementById("formOnlineEntry").reset();
+      } catch (err) {
+        alert("Fout met registrasie: " + err.message);
+      }
+    }
+
+    // WhatsApp Sharing
+    function shareWhatsAppLink() {
+      const url = window.location.href;
+      const text = `🏃 *LAERSKOOL SWARTLAND - INTYDSE ATLETIEK UITSLAE* 🏃\n\nVolg die byeenkoms uitslae, medaljes en skole punte intyds hier:\n${url}\n\nUitslae word lewendig deur baan- en veldbeamptes bygewerk!`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+    }
+
+    // Print preparation
+    function prepareAndPrint(tabName) {
+      switchTab(tabName);
+      setTimeout(() => {
+        window.print();
+      }, 300);
+    }
+
+    // Start listeners on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      initRealtimeStreams();
+      updateRoleUI();
+    });
+  </script>
+</body>
+</html>

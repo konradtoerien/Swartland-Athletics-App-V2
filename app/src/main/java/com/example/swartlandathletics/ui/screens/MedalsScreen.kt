@@ -17,12 +17,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.swartlandathletics.data.AthleticsRepository
 import com.example.swartlandathletics.ui.theme.*
+import com.example.swartlandathletics.util.AppLanguage
+import com.example.swartlandathletics.util.L10n
+import com.example.swartlandathletics.util.LanguageManager
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedalsScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val language by LanguageManager.currentLanguage.collectAsState()
+    val isEnglish = language == AppLanguage.ENGLISH
+
     val results by AthleticsRepository.results.collectAsState()
     val completedCeremonies by AthleticsRepository.completedCeremonies.collectAsState()
 
@@ -36,10 +43,10 @@ fun MedalsScreen(
             .fillMaxSize()
             .background(LssNavyDark)
     ) {
-        SmallTopAppBar(
+        TopAppBar(
             title = {
                 Text(
-                    text = "🥇 Medaljetafel & Prysdeling",
+                    text = if (isEnglish) "🥇 Medal Table & Ceremonies" else "🥇 Medaljetafel & Prysdeling",
                     color = LssGold,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -47,10 +54,10 @@ fun MedalsScreen(
             },
             navigationIcon = {
                 IconButton(onClick = onNavigateBack, modifier = Modifier.testTag("btn_back_medals")) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Terug", tint = LssGold)
+                    Icon(Icons.Default.ArrowBack, contentDescription = L10n.back(language), tint = LssGold)
                 }
             },
-            colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = LssNavyHeader)
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = LssNavyHeader)
         )
 
         LazyColumn(
@@ -66,7 +73,7 @@ fun MedalsScreen(
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.MilitaryTech, contentDescription = null, tint = LssGold)
+                            Icon(Icons.Default.Star, contentDescription = null, tint = LssGold)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Amptelike Prysdelingstafel", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                         }
@@ -89,7 +96,7 @@ fun MedalsScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = LssTextMuted, modifier = Modifier.size(48.dp))
+                            Icon(Icons.Default.Star, contentDescription = null, tint = LssTextMuted, modifier = Modifier.size(48.dp))
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
                                 "Nog geen items gefinaliseer vir medalje-oorhandiging nie.",
@@ -119,7 +126,7 @@ fun MedalsScreen(
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
-                                        imageVector = if (isDone) Icons.Default.CheckCircle else Icons.Default.EmojiEvents,
+                                        imageVector = if (isDone) Icons.Default.Check else Icons.Default.Star,
                                         contentDescription = null,
                                         tint = if (isDone) LssGreenSuccess else LssGold
                                     )

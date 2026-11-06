@@ -1,0 +1,8 @@
+{
+  "firestore": [
+    {
+      "database": "ai-studio-android-swartlan-d1579b6e-c3cc-4480-9c0e-cac716751650",
+      "rules": "firestore.rules"
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Entity Validation Helpers
+    function isValidAthlete(data) {
+      return data.firstName is string && data.firstName.size() > 0 && data.firstName.size() <= 60 &&
+             data.lastName is string && data.lastName.size() > 0 && data.lastName.size() <= 60 &&
+             data.school is string && data.school.size() > 0 && data.school.size() <= 100 &&
+             data.gender in ['Seuns', 'Dogters'] &&
+             data.ageGroup in ['6', '7', '8', '9', '10', '11', '12', '13'] &&
+             data.events is list && data.events.size() <= 20 &&
+             data.userId is string && data.userId.size() <= 128 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             (!('updatedAt' in data) || (data.updatedAt is timestamp && data.updatedAt <= request.time));
+    }
+
+    function isValidRecord(data) {
+      return data.eventName is string && data.eventName.size() > 0 && data.eventName.size() <= 60 &&
+             data.gender in ['Seuns', 'Dogters'] &&
+             data.ageGroup in ['6', '7', '8', '9', '10', '11', '12', '13'] &&
+             data.recordValue is string && data.recordValue.size() > 0 && data.recordValue.size() <= 30 &&
+             data.holder is string && data.holder.size() > 0 && data.holder.size() <= 100 &&
+             data.year is int && data.year >= 1950 && data.year <= 2050 &&
+             data.userId is string && data.userId.size() <= 128 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             (!('updatedAt' in data) || (data.updatedAt is timestamp && data.updatedAt <= request.time));
+    }
+
+    function isValidResult(data) {
+      return data.eventName is string && data.eventName.size() > 0 && data.eventName.size() <= 60 &&
+             data.gender in ['Seuns', 'Dogters'] &&
+             data.ageGroup in ['6', '7', '8', '9', '10', '11', '12', '13'] &&
+             data.place is int && data.place >= 1 && data.place <= 100 &&
+             data.athleteName is string && data.athleteName.size() > 0 && data.athleteName.size() <= 100 &&
+             data.school is string && data.school.size() > 0 && data.school.size() <= 100 &&
+             data.resultValue is string && data.resultValue.size() > 0 && data.resultValue.size() <= 30 &&
+             data.asaPoints is int && data.asaPoints >= 0 && data.asaPoints <= 1500 &&
+             data.userId is string && data.userId.size() <= 128 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             (!('updatedAt' in data) || (data.updatedAt is timestamp && data.updatedAt <= request.time));
+    }
+
+    function isValidProgramItem(data) {
+      return data.itemNo is int && data.itemNo >= 1 && data.itemNo <= 500 &&
+             data.startTime is string && data.startTime.size() > 0 && data.startTime.size() <= 20 &&
+             data.ageGroup in ['6', '7', '8', '9', '10', '11', '12', '13'] &&
+             data.gender in ['Seuns', 'Dogters'] &&
+             data.eventName is string && data.eventName.size() > 0 && data.eventName.size() <= 60 &&
+             data.venue is string && data.venue.size() > 0 && data.venue.size() <= 60 &&
+             data.status in ['Wagtend', 'Besig', 'Voltooi'] &&
+             data.userId is string && data.userId.size() <= 128 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             (!('updatedAt' in data) || (data.updatedAt is timestamp && data.updatedAt <= request.time));
+    }
+
+    // 1. Athletes Collection
+    match /athletes/{athleteId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidId(athleteId) && isValidAthlete(incoming()) && incoming().userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(athleteId) && isValidAthlete(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if isSignedIn() && isValidId(athleteId);
+    }
+
+    // 2. Records Collection
+    match /records/{recordId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidId(recordId) && isValidRecord(incoming()) && incoming().userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(recordId) && isValidRecord(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if isSignedIn() && isValidId(recordId);
+    }
+
+    // 3. Results Collection
+    match /results/{resultId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidId(resultId) && isValidResult(incoming()) && incoming().userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(resultId) && isValidResult(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if isSignedIn() && isValidId(resultId);
+    }
+
+    // 4. Program Collection
+    match /program/{programId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidId(programId) && isValidProgramItem(incoming()) && incoming().userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(programId) && isValidProgramItem(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if isSignedIn() && isValidId(programId);
+    }
+  }
+}

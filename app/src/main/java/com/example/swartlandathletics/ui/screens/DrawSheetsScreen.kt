@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -13,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -20,13 +20,23 @@ import androidx.compose.ui.unit.sp
 import com.example.swartlandathletics.data.AthleticsRepository
 import com.example.swartlandathletics.model.AppConstants
 import com.example.swartlandathletics.ui.theme.*
+import com.example.swartlandathletics.util.AppLanguage
+import com.example.swartlandathletics.util.CsvManager
+import com.example.swartlandathletics.util.L10n
+import com.example.swartlandathletics.util.LanguageManager
+import kotlin.random.Random
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrawSheetsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToOfficiating: (event: String, gender: String, age: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val language by LanguageManager.currentLanguage.collectAsState()
+    val isEnglish = language == AppLanguage.ENGLISH
+
     val athletes by AthleticsRepository.athletes.collectAsState()
     val results by AthleticsRepository.results.collectAsState()
 
@@ -38,11 +48,20 @@ fun DrawSheetsScreen(
     }
     var selectedEvent by remember { mutableStateOf("100m") }
 
+    // Randomization state (Point 4)
+    var isRandomized by remember { mutableStateOf(false) }
+    var randomSeed by remember { mutableIntStateOf(1) }
+
     // Ensure selectedEvent is valid
     LaunchedEffect(availableEvents) {
         if (!availableEvents.contains(selectedEvent) && availableEvents.isNotEmpty()) {
             selectedEvent = availableEvents.first()
         }
+    }
+
+    // Reset randomization when item selection changes
+    LaunchedEffect(selectedEvent, selectedGender, selectedAge) {
+        isRandomized = false
     }
 
     // Matching athletes for this event
@@ -51,6 +70,14 @@ fun DrawSheetsScreen(
             a.ageGroup == selectedAge &&
                     a.gender.equals(selectedGender, ignoreCase = true) &&
                     a.events.any { it.equals(selectedEvent, ignoreCase = true) }
+        }
+    }
+
+    val displayedAthletes = remember(matchingAthletes, isRandomized, randomSeed) {
+        if (isRandomized) {
+            matchingAthletes.shuffled(Random(randomSeed))
+        } else {
+            matchingAthletes
         }
     }
 
@@ -63,10 +90,10 @@ fun DrawSheetsScreen(
             .fillMaxSize()
             .background(LssNavyDark)
     ) {
-        SmallTopAppBar(
+        TopAppBar(
             title = {
                 Text(
-                    text = "📄 Lotingslyste (Draw Sheets)",
+                    text = if (isEnglish) "📄 Event Draw Sheets" else "📄 Byeenkoms Lotingslyste",
                     color = LssGold,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -74,10 +101,10 @@ fun DrawSheetsScreen(
             },
             navigationIcon = {
                 IconButton(onClick = onNavigateBack, modifier = Modifier.testTag("btn_back_draw_sheets")) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Terug", tint = LssGold)
+                    Icon(Icons.Default.ArrowBack, contentDescription = L10n.back(language), tint = LssGold)
                 }
             },
-            colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = LssNavyHeader)
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = LssNavyHeader)
         )
 
         LazyColumn(
@@ -93,10 +120,15 @@ fun DrawSheetsScreen(
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
-                        Text("Kies Item Besonderhede", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text(
+                            text = if (isEnglish) "Select Event Details" else "Kies Item Besonderhede",
+                            color = LssGold,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        Text("Ouderdomsgroep:", color = LssTextMuted, fontSize = 12.sp)
+                        Text(if (isEnglish) "Age Group:" else "Ouderdomsgroep:", color = LssTextMuted, fontSize = 12.sp)
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             items(AppConstants.AGE_GROUPS) { age ->
                                 FilterChip(
@@ -108,19 +140,19 @@ fun DrawSheetsScreen(
                         }
 
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text("Geslag:", color = LssTextMuted, fontSize = 12.sp)
+                        Text(if (isEnglish) "Gender:" else "Geslag:", color = LssTextMuted, fontSize = 12.sp)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             AppConstants.GENDERS.forEach { g ->
                                 FilterChip(
                                     selected = selectedGender == g,
                                     onClick = { selectedGender = g },
-                                    label = { Text(g) }
+                                    label = { Text(if (isEnglish && g == "Seuns") "Boys" else if (isEnglish && g == "Dogters") "Girls" else g) }
                                 )
                             }
                         }
 
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text("Item / Dissipline:", color = LssTextMuted, fontSize = 12.sp)
+                        Text(if (isEnglish) "Event / Discipline:" else "Item / Dissipline:", color = LssTextMuted, fontSize = 12.sp)
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             items(availableEvents) { ev ->
                                 FilterChip(
@@ -134,36 +166,108 @@ fun DrawSheetsScreen(
                 }
             }
 
-            // Action banner
+            // POINT 4: Randomization & Export Action Toolbar
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = LssNavyCard),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Column {
-                        Text(
-                            text = "O/$selectedAge $selectedGender - $selectedEvent",
-                            color = LssGold,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
-                        )
-                        Text(
-                            text = "${matchingAthletes.size} atlete geregistreer",
-                            color = LssTextMuted,
-                            fontSize = 12.sp
-                        )
-                    }
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "O/$selectedAge $selectedGender - $selectedEvent",
+                                    color = LssGold,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 15.sp
+                                )
+                                Text(
+                                    text = if (isRandomized)
+                                        "${displayedAthletes.size} atlete • 🎲 Ewekansig Geloot (Randomized)"
+                                    else
+                                        "${displayedAthletes.size} atlete • Standaard Inskrywingsvolgorde",
+                                    color = if (isRandomized) LssGreenSuccess else LssTextMuted,
+                                    fontSize = 12.sp
+                                )
+                            }
 
-                    Button(
-                        onClick = { onNavigateToOfficiating(selectedEvent, selectedGender, selectedAge) },
-                        colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.testTag("btn_go_to_officiating")
-                    ) {
-                        Icon(Icons.Default.Timer, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Beoordeel", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            Button(
+                                onClick = { onNavigateToOfficiating(selectedEvent, selectedGender, selectedAge) },
+                                colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.testTag("btn_go_to_officiating")
+                            ) {
+                                Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(if (isEnglish) "Officiate" else "Beoordeel", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // Controls: Randomize Lanes & Export Draw Sheet
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            // Randomize Button
+                            Button(
+                                onClick = {
+                                    randomSeed = (1..999999).random()
+                                    isRandomized = true
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (isRandomized) LssNavyHeader else LssGold,
+                                    contentColor = if (isRandomized) LssGold else LssNavyHeader
+                                ),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (isRandomized)
+                                        (if (isEnglish) "Re-Shuffle" else "Herloot")
+                                    else
+                                        (if (isEnglish) "🎲 Randomize Lanes" else "🎲 Ewekansige Loting"),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp
+                                )
+                            }
+
+                            // Export Draw Sheet Button (with randomized lanes!)
+                            OutlinedButton(
+                                onClick = {
+                                    val csvContent = CsvManager.generateDrawSheetCsv(
+                                        eventName = selectedEvent,
+                                        ageGroup = selectedAge,
+                                        gender = selectedGender,
+                                        athletes = displayedAthletes,
+                                        isRandomized = isRandomized
+                                    )
+                                    CsvManager.shareContent(
+                                        context = context,
+                                        title = "Lotingslys_${selectedEvent}_o${selectedAge}_${selectedGender}.csv",
+                                        content = csvContent
+                                    )
+                                },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = LssGold),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (isEnglish) "Export Sheet (CSV)" else "Deel Lotingslys",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -181,24 +285,46 @@ fun DrawSheetsScreen(
                                 .background(LssNavyHeader, RoundedCornerShape(6.dp))
                                 .padding(horizontal = 12.dp, vertical = 8.dp)
                         ) {
-                            Text("Baan/Pos", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.width(64.dp))
-                            Text("Atleet Naam", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.weight(1.5f))
-                            Text("Skool", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.weight(1.2f))
+                            Text(
+                                text = if (isEnglish) "Lane/Pos" else "Baan/Pos",
+                                color = LssGold,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                modifier = Modifier.width(68.dp)
+                            )
+                            Text(
+                                text = if (isEnglish) "Athlete Name" else "Atleet Naam",
+                                color = LssGold,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                modifier = Modifier.weight(1.5f)
+                            )
+                            Text(
+                                text = if (isEnglish) "School" else "Skool",
+                                color = LssGold,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                modifier = Modifier.weight(1.2f)
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(6.dp))
 
-                        if (matchingAthletes.isEmpty()) {
+                        if (displayedAthletes.isEmpty()) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(24.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("Geen atlete vir hierdie item gevind nie.", color = LssTextMuted, fontSize = 13.sp)
+                                Text(
+                                    text = if (isEnglish) "No athletes registered for this event." else "Geen atlete vir hierdie item gevind nie.",
+                                    color = LssTextMuted,
+                                    fontSize = 13.sp
+                                )
                             }
                         } else {
-                            matchingAthletes.forEachIndexed { index, athlete ->
+                            displayedAthletes.forEachIndexed { index, athlete ->
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -206,11 +332,11 @@ fun DrawSheetsScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = "Baan ${index + 1}",
-                                        color = LssTextWhite,
+                                        text = "${if (isEnglish) "Lane" else "Baan"} ${index + 1}",
+                                        color = if (isRandomized) LssGold else LssTextWhite,
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 13.sp,
-                                        modifier = Modifier.width(64.dp)
+                                        modifier = Modifier.width(68.dp)
                                     )
                                     Text(
                                         text = athlete.fullName,
@@ -225,8 +351,8 @@ fun DrawSheetsScreen(
                                         modifier = Modifier.weight(1.2f)
                                     )
                                 }
-                                if (index < matchingAthletes.size - 1) {
-                                    Divider(color = LssNavyCardLight.copy(alpha = 0.5f))
+                                if (index < displayedAthletes.size - 1) {
+                                    HorizontalDivider(color = LssNavyCardLight.copy(alpha = 0.5f))
                                 }
                             }
                         }
@@ -243,9 +369,14 @@ fun DrawSheetsScreen(
                     ) {
                         Column(modifier = Modifier.padding(14.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.CheckCircle, contentDescription = null, tint = LssGreenSuccess)
+                                Icon(Icons.Default.Check, contentDescription = null, tint = LssGreenSuccess)
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Reeds Gefinaliseerde Uitslae", color = LssGold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                Text(
+                                    text = if (isEnglish) "Finalized Results for this Event" else "Reeds Gefinaliseerde Uitslae",
+                                    color = LssGold,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp
+                                )
                             }
                             Spacer(modifier = Modifier.height(10.dp))
 
