@@ -40,10 +40,17 @@ object AthleticsRepository {
     private val _completedCeremonies = MutableStateFlow<Set<String>>(emptySet())
     val completedCeremonies: StateFlow<Set<String>> = _completedCeremonies.asStateFlow()
 
+    private val _meetName = MutableStateFlow<String>("Laerskool Swartland Atletiekbijeenkoms")
+    val meetName: StateFlow<String> = _meetName.asStateFlow()
+
+    private val _meetDate = MutableStateFlow<String>("2026-02-15")
+    val meetDate: StateFlow<String> = _meetDate.asStateFlow()
+
     private var athletesListener: ListenerRegistration? = null
     private var recordsListener: ListenerRegistration? = null
     private var resultsListener: ListenerRegistration? = null
     private var programListener: ListenerRegistration? = null
+    private var meetInfoListener: ListenerRegistration? = null
 
     fun initialize(context: Context) {
         if (db != null) return
@@ -58,6 +65,18 @@ object AthleticsRepository {
 
     fun startRealtimeSync() {
         val firestore = db ?: return
+
+        // 0. Meet info listener
+        meetInfoListener?.remove()
+        meetInfoListener = firestore.collection("settings").document("meet_info")
+            .addSnapshotListener { snapshot, error ->
+                if (snapshot != null && snapshot.exists()) {
+                    val name = snapshot.getString("name")
+                    val date = snapshot.getString("date")
+                    if (!name.isNullOrBlank()) _meetName.value = name
+                    if (!date.isNullOrBlank()) _meetDate.value = date
+                }
+            }
 
         // 1. Athletes real-time snapshot listener
         athletesListener?.remove()
@@ -505,11 +524,36 @@ object AthleticsRepository {
         }
     }
 
+    fun updateMeetInfo(name: String, date: String, onComplete: ((Boolean, String) -> Unit)? = null) {
+        val cleanName = name.ifBlank { "Laerskool Swartland Atletiek" }
+        val cleanDate = date.ifBlank { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date()) }
+        _meetName.value = cleanName
+        _meetDate.value = cleanDate
+        val firestore = db ?: run {
+            onComplete?.invoke(true, "Byeenkoms inligting plaaslik opgedateer.")
+            return
+        }
+        val doc = mapOf(
+            "name" to cleanName,
+            "date" to cleanDate,
+            "updatedAt" to FieldValue.serverTimestamp()
+        )
+        firestore.collection("settings").document("meet_info").set(doc)
+            .addOnSuccessListener {
+                onComplete?.invoke(true, "Byeenkoms inligting suksesvol gestoor!")
+            }
+            .addOnFailureListener { e ->
+                onComplete?.invoke(false, "Fout met stoor: ${e.localizedMessage}")
+            }
+    }
+
     // Meet Template Backup & Restore (Program & Records for New Meets / Next Year)
-    fun exportMeetTemplateJson(meetName: String, meetDate: String): String {
+    fun exportMeetTemplateJson(meetName: String = _meetName.value, meetDate: String = _meetDate.value): String {
         val root = org.json.JSONObject()
-        root.put("meetName", meetName.ifBlank { "Laerskool Swartland Atletiek" })
-        root.put("meetDate", meetDate.ifBlank { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date()) })
+        val nameToUse = meetName.ifBlank { _meetName.value.ifBlank { "Laerskool Swartland Atletiek" } }
+        val dateToUse = meetDate.ifBlank { _meetDate.value.ifBlank { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date()) } }
+        root.put("meetName", nameToUse)
+        root.put("meetDate", dateToUse)
         root.put("exportedAt", System.currentTimeMillis())
         root.put("version", 1)
 
@@ -557,8 +601,11 @@ object AthleticsRepository {
 
         try {
             val root = org.json.JSONObject(jsonString)
-            val meetName = root.optString("meetName", "Byeenkoms")
+            val meetName = root.optString("meetName", "")
             val meetDate = root.optString("meetDate", "")
+            if (meetName.isNotBlank()) {
+                updateMeetInfo(meetName, meetDate)
+            }
             val progArray = root.optJSONArray("program") ?: org.json.JSONArray()
             val recArray = root.optJSONArray("records") ?: org.json.JSONArray()
 

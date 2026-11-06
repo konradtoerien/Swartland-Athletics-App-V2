@@ -61,8 +61,8 @@ fun EventDashboardScreen(
     val language by LanguageManager.currentLanguage.collectAsState()
     val role by RoleManager.currentRole.collectAsState()
 
-    var showWebConfigDialog by remember { mutableStateOf(false) }
-    var currentWebUrlInput by remember { mutableStateOf(WebDashboardConfig.getWebUrl(context)) }
+    val currentMeetName by AthleticsRepository.meetName.collectAsState()
+    val currentMeetDate by AthleticsRepository.meetDate.collectAsState()
 
     // 1. Live Firestore streams via StateFlow
     val athletes by AthleticsRepository.athletes.collectAsState()
@@ -191,7 +191,7 @@ fun EventDashboardScreen(
 
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = "Laerskool Swartland",
+                                        text = currentMeetName,
                                         color = LssGold,
                                         fontSize = headerTitleSize,
                                         fontWeight = FontWeight.Bold,
@@ -199,7 +199,7 @@ fun EventDashboardScreen(
                                         overflow = TextOverflow.Ellipsis
                                     )
                                     Text(
-                                        text = L10n.meetDashboardTitle(language),
+                                        text = if (currentMeetDate.isNotBlank()) "${L10n.meetDashboardTitle(language)} • $currentMeetDate" else L10n.meetDashboardTitle(language),
                                         color = LssTextLight,
                                         fontSize = bodyTextSize,
                                         maxLines = 1,
@@ -407,24 +407,9 @@ fun EventDashboardScreen(
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            TextButton(
-                                onClick = {
-                                    currentWebUrlInput = WebDashboardConfig.getWebUrl(context)
-                                    showWebConfigDialog = true
-                                },
-                                contentPadding = PaddingValues(0.dp)
-                            ) {
-                                Text(
-                                    text = if (language == AppLanguage.ENGLISH) "⚙️ Fix 404 / Web Link Settings →" else "⚙️ Hoekom 404? / Skakel Instellings →",
-                                    color = LssGold,
-                                    fontSize = captionSize,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-
                             TextButton(
                                 onClick = { WebDashboardConfig.openInBrowser(context) },
                                 contentPadding = PaddingValues(0.dp)
@@ -883,121 +868,6 @@ fun EventDashboardScreen(
                 }
             }
         }
-    }
-
-    if (showWebConfigDialog) {
-        AlertDialog(
-            onDismissRequest = { showWebConfigDialog = false },
-            title = {
-                Text(
-                    text = if (language == AppLanguage.ENGLISH) "⚙️ How to Activate GitHub Pages (15 sec)" else "⚙️ Hoe om GitHub Pages te Aktiveer (15 sek)",
-                    color = LssGold,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 17.sp
-                )
-            },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text(
-                        text = if (language == AppLanguage.ENGLISH)
-                            "GitHub shows '404 There isn't a GitHub Pages site here' because Pages must be switched ON once in your repository settings:"
-                        else
-                            "GitHub wys '404 There isn't a GitHub Pages site here' omdat Pages eenmalig in jou GitHub repository geaktiveer moet word:",
-                        color = LssTextLight,
-                        fontSize = 12.sp
-                    )
-
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = LssNavyDark,
-                        border = BorderStroke(1.dp, LssGold.copy(alpha = 0.4f)),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(
-                                text = if (language == AppLanguage.ENGLISH)
-                                    "1. Click 'Open GitHub Settings' below."
-                                else
-                                    "1. Klik 'Maak GitHub Settings Oop' hieronder.",
-                                color = LssGold,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Text(
-                                text = if (language == AppLanguage.ENGLISH)
-                                    "2. Under 'Build and deployment', set Branch: 'main', Folder: '/ (root)'."
-                                else
-                                    "2. Onder 'Build and deployment', kies Branch: 'main', Folder: '/ (root)'.",
-                                color = LssTextLight,
-                                fontSize = 11.sp
-                            )
-                            Text(
-                                text = if (language == AppLanguage.ENGLISH)
-                                    "3. Click 'Save'. It will be live in ~60 seconds!"
-                                else
-                                    "3. Klik 'Save'. Die webwerf sal binne ~60 sekondes regstreeks werk!",
-                                color = LssGreenSuccess,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-
-                    Text(
-                        text = if (language == AppLanguage.ENGLISH) "Current Web Dashboard URL:" else "Huidige Web Dashboard Skakel:",
-                        color = LssTextMuted,
-                        fontSize = 11.sp
-                    )
-
-                    OutlinedTextField(
-                        value = currentWebUrlInput,
-                        onValueChange = { currentWebUrlInput = it },
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = LssGold,
-                            unfocusedBorderColor = LssGold.copy(alpha = 0.5f),
-                            focusedTextColor = LssTextLight,
-                            unfocusedTextColor = LssTextLight
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Button(
-                        onClick = { WebDashboardConfig.openGitHubPagesSettings(context) },
-                        colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = if (language == AppLanguage.ENGLISH) "Open GitHub Pages Settings ↗" else "Maak GitHub Pages Settings Oop ↗",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        WebDashboardConfig.setWebUrl(context, currentWebUrlInput)
-                        showWebConfigDialog = false
-                        Toast.makeText(context, if (language == AppLanguage.ENGLISH) "Web URL saved!" else "Skakel gestoor!", Toast.LENGTH_SHORT).show()
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader)
-                ) {
-                    Text(if (language == AppLanguage.ENGLISH) "Save URL" else "Stoor Skakel", fontWeight = FontWeight.Bold)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showWebConfigDialog = false }) {
-                    Text(L10n.cancel(language), color = LssTextMuted)
-                }
-            },
-            containerColor = LssNavyCard,
-            shape = RoundedCornerShape(16.dp)
-        )
     }
 }
 

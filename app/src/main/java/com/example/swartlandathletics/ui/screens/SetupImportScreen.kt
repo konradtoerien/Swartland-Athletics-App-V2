@@ -62,6 +62,12 @@ fun SetupImportScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     val athletes by AthleticsRepository.athletes.collectAsState()
 
+    val currentMeetName by AthleticsRepository.meetName.collectAsState()
+    val currentMeetDate by AthleticsRepository.meetDate.collectAsState()
+
+    var inputMeetName by remember(currentMeetName) { mutableStateOf(currentMeetName) }
+    var inputMeetDate by remember(currentMeetDate) { mutableStateOf(currentMeetDate) }
+
     var filterSchool by remember { mutableStateOf("Alle Skole") }
     var filterGender by remember { mutableStateOf("Alle Geslagte") }
     var filterAge by remember { mutableStateOf("Alle Ouderdomme") }
@@ -199,17 +205,22 @@ fun SetupImportScreen(
             Tab(
                 selected = selectedTab == 0,
                 onClick = { selectedTab = 0 },
-                text = { Text(if (isEnglish) "Athletes (${athletes.size})" else "Atlete (${athletes.size})", fontSize = 12.sp, maxLines = 1) }
+                text = { Text(if (isEnglish) "🏆 Event Setup" else "🏆 Byeenkoms Setup", fontSize = 11.sp, maxLines = 1) }
             )
             Tab(
                 selected = selectedTab == 1,
                 onClick = { selectedTab = 1 },
-                text = { Text(if (isEnglish) "Add Athlete" else "Nuwe Atleet", fontSize = 12.sp, maxLines = 1) }
+                text = { Text(if (isEnglish) "Athletes (${athletes.size})" else "Atlete (${athletes.size})", fontSize = 11.sp, maxLines = 1) }
             )
             Tab(
                 selected = selectedTab == 2,
                 onClick = { selectedTab = 2 },
-                text = { Text(if (isEnglish) "✍️ Digital Sheet" else "✍️ Digitale Sigblad", fontSize = 12.sp, maxLines = 1) }
+                text = { Text(if (isEnglish) "Add Athlete" else "Nuwe Atleet", fontSize = 11.sp, maxLines = 1) }
+            )
+            Tab(
+                selected = selectedTab == 3,
+                onClick = { selectedTab = 3 },
+                text = { Text(if (isEnglish) "✍️ Digital Sheet" else "✍️ Digitale Sigblad", fontSize = 11.sp, maxLines = 1) }
             )
         }
 
@@ -241,7 +252,215 @@ fun SetupImportScreen(
 
         when (selectedTab) {
             0 -> {
-                // ==================== TAB 0: ATHLETES LIST ====================
+                // ==================== TAB 0: EVENT NAME & DATE SETUP / BACKUP ====================
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    item {
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = LssNavyCard),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.5.dp, LssGold)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Default.Star, contentDescription = null, tint = LssGold, modifier = Modifier.size(24.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = if (isEnglish) "🏆 Event Name & Date Setup" else "🏆 Stel Byeenkoms Naam & Datum In",
+                                        color = LssGold,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp
+                                    )
+                                }
+                                Text(
+                                    text = if (isEnglish)
+                                        "Specify the name and date for the current athletics meet. This metadata is saved with your backup templates so you can easily reload or share programs between different events."
+                                    else
+                                        "Stel die naam en datum in vir die huidige atletiekbyeenkoms. Hierdie inligting word saam met jou rugsteun-sjablone gestoort sodat jy maklik programme tussen verskillende byeenkomste kan hergebruik.",
+                                    color = LssTextLight,
+                                    fontSize = 12.sp
+                                )
+
+                                Spacer(modifier = Modifier.height(4.dp))
+
+                                OutlinedTextField(
+                                    value = inputMeetName,
+                                    onValueChange = { inputMeetName = it },
+                                    label = { Text(if (isEnglish) "Event / Meet Name" else "Byeenkoms Naam") },
+                                    placeholder = { Text("bv. Laerskool Swartland Interhuis 2026") },
+                                    modifier = Modifier.fillMaxWidth().testTag("input_meet_name"),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = LssGold,
+                                        unfocusedBorderColor = LssNavyCardLight,
+                                        focusedLabelColor = LssGold
+                                    )
+                                )
+
+                                OutlinedTextField(
+                                    value = inputMeetDate,
+                                    onValueChange = { inputMeetDate = it },
+                                    label = { Text(if (isEnglish) "Event Date (YYYY-MM-DD)" else "Byeenkoms Datum (JJJJ-MM-DD)") },
+                                    placeholder = { Text("2026-02-15") },
+                                    modifier = Modifier.fillMaxWidth().testTag("input_meet_date"),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = LssGold,
+                                        unfocusedBorderColor = LssNavyCardLight,
+                                        focusedLabelColor = LssGold
+                                    )
+                                )
+
+                                Button(
+                                    onClick = {
+                                        AthleticsRepository.updateMeetInfo(inputMeetName, inputMeetDate) { success, msg ->
+                                            statusMessage = msg
+                                        }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader),
+                                    modifier = Modifier.fillMaxWidth().height(46.dp).testTag("btn_save_meet_info")
+                                ) {
+                                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(if (isEnglish) "Save Event Details" else "Stoor Byeenkoms Inligting", fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = LssNavyCard),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Default.Share, contentDescription = null, tint = LssGold, modifier = Modifier.size(22.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = if (isEnglish) "💾 Export Event Backup / Template" else "💾 Stoor Byeenkoms Sjabloon (.json)",
+                                        color = LssGold,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 15.sp
+                                    )
+                                }
+                                Text(
+                                    text = if (isEnglish)
+                                        "Exports the program and records along with the event name ('$currentMeetName') and date ('$currentMeetDate'). Upload this file next year to instantly recreate the meet setup."
+                                    else
+                                        "Voer die huidige program en rekords uit saam met die byeenkomsnaam ('$currentMeetName') en datum ('$currentMeetDate'). Laai hierdie lêer volgende jaar op om die byeenkoms outomaties te herstel.",
+                                    color = LssTextMuted,
+                                    fontSize = 12.sp
+                                )
+
+                                Button(
+                                    onClick = {
+                                        val jsonStr = AthleticsRepository.exportMeetTemplateJson(inputMeetName, inputMeetDate)
+                                        val safeName = inputMeetName.trim().replace("\\s+".toRegex(), "_")
+                                        val fileName = "${safeName}_${inputMeetDate}_backup.json"
+                                        CsvManager.shareContent(context = context, title = fileName, content = jsonStr)
+                                        statusMessage = if (isEnglish) "Event backup ($fileName) exported successfully!" else "Byeenkoms rugsteun ($fileName) suksesvol uitgevoer!"
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = LssGold, contentColor = LssNavyHeader),
+                                    modifier = Modifier.fillMaxWidth().height(46.dp).testTag("btn_export_meet_backup")
+                                ) {
+                                    Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(if (isEnglish) "Export Event Backup (.json)" else "Stoor Byeenkoms Rugsteun (.json)", fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = LssNavyCard),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Default.Add, contentDescription = null, tint = LssGreenSuccess, modifier = Modifier.size(22.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = if (isEnglish) "📂 Load Stored Event Backup" else "📂 Laai Byeenkoms Sjabloon In",
+                                        color = LssGreenSuccess,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 15.sp
+                                    )
+                                }
+                                Text(
+                                    text = if (isEnglish)
+                                        "Upload a saved event JSON file from a previous year or another school to automatically import its event name, date, program, and records."
+                                    else
+                                        "Laai 'n gestoorde JSON-lêer van 'n vorige jaar of ander skool op om die byeenkoms se naam, datum, program en rekords outomaties in te voer.",
+                                    color = LssTextMuted,
+                                    fontSize = 12.sp
+                                )
+
+                                Button(
+                                    onClick = {
+                                        currentFilePickerMode = "meet_template"
+                                        filePickerLauncher.launch("*/*")
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = LssGreenSuccess, contentColor = LssNavyHeader),
+                                    modifier = Modifier.fillMaxWidth().height(46.dp).testTag("btn_import_meet_backup")
+                                ) {
+                                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(if (isEnglish) "Load Backup (.json)" else "Laai Gestoorde Sjabloon (.json)", fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = LssNavyCard),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, LssRedError.copy(alpha = 0.5f))
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Default.Refresh, contentDescription = null, tint = LssRedError, modifier = Modifier.size(22.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = if (isEnglish) "🔄 Reset for New Event" else "🔄 Nuwe Byeenkoms / Vars Begin",
+                                        color = LssRedError,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 15.sp
+                                    )
+                                }
+                                Text(
+                                    text = if (isEnglish)
+                                        "Clears entered athletes and results while retaining program and records for the new event."
+                                    else
+                                        "Vee geregistreerde atlete en uitslae uit terwyl die program en rekords behou word vir die nuwe byeenkoms.",
+                                    color = LssTextMuted,
+                                    fontSize = 12.sp
+                                )
+
+                                OutlinedButton(
+                                    onClick = {
+                                        AthleticsRepository.resetMeetForNewYear(clearAthletes = true, resetProgramStatus = true, clearResults = true) {
+                                            statusMessage = if (isEnglish) "Meet reset for new event!" else "Byeenkoms herstel vir nuwe byeenkoms!"
+                                        }
+                                    },
+                                    border = BorderStroke(1.dp, LssRedError),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = LssRedError),
+                                    modifier = Modifier.fillMaxWidth().height(44.dp).testTag("btn_reset_meet")
+                                ) {
+                                    Text(if (isEnglish) "Reset Athletes & Results" else "Vee Atlete & Uitslae Uit vir Nuwe Byeenkoms", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            1 -> {
+                // ==================== TAB 1: ATHLETES LIST ====================
                 val filteredAthletes = remember(athletes, filterSchool, filterGender, filterAge) {
                     athletes.filter { a ->
                         (filterSchool == "Alle Skole" || a.school == filterSchool) &&
@@ -437,8 +656,8 @@ fun SetupImportScreen(
                 }
             }
 
-            1 -> {
-                // ==================== TAB 1: ADD SINGLE ATHLETE ====================
+            2 -> {
+                // ==================== TAB 2: ADD SINGLE ATHLETE ====================
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -641,7 +860,7 @@ fun SetupImportScreen(
                                     inputFirstName = ""
                                     inputLastName = ""
                                     selectedEvents = emptySet()
-                                    selectedTab = 0
+                                    selectedTab = 1
                                 } else {
                                     statusMessage = if (isEnglish) "Please fill in first name, surname, and school." else "Vul voornaam, van en skool in."
                                 }
@@ -660,8 +879,8 @@ fun SetupImportScreen(
                 }
             }
 
-            2 -> {
-                // ==================== TAB 2: EXCEL / CSV BULK IMPORT & EXPORT ====================
+            3 -> {
+                // ==================== TAB 3: EXCEL / CSV BULK IMPORT & EXPORT ====================
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()

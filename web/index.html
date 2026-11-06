@@ -1224,72 +1224,127 @@
       </div>
     </div>
 
-    <!-- 8. OFFICIALS ENTRY PORTAL (PC RESULT ENTRY) -->
+    <!-- 8. OFFICIALS ENTRY PORTAL (MATCHING APP OFFICIATING INTERFACE) -->
     <div id="view-officials" class="view-section">
       <div class="section-card">
         <div class="card-title">
-          <span data-i18n="officialsPortalTitle">⌨️ Beampte Uitslae Tik-Portaal (PC Rekenaar Invoer)</span>
+          <span>⏱️ Beampte Uitslae Tik-Portaal (Soos App)</span>
           <span style="font-size: 12px; color: var(--lss-green);">● Gemagtig as Beampte</span>
         </div>
-        <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 16px;" data-i18n="officialsPortalSub">
-          Tik amptelike uitslae direk vanaf jou rekenaarsleutelbord in. Dit sinkroniseer onmiddellik na alle fone en die lewendige webwerf.
+        <p style="font-size: 13px; color: var(--lss-text-muted); margin-bottom: 14px;">
+          Kies 'n geregistreerde item uit die Program. Die stelsel vind outomaties alle ingeskryfde atlete sodat jy slegs hul tye of afstände hoef in te tik.
         </p>
-        <form id="formOfficialResult" onsubmit="submitOfficialResult(event)">
-          <div class="form-row">
-            <div class="form-group">
-              <label data-i18n="lblEventName">Item Naam</label>
-              <input type="text" class="form-control" id="inpEventName" placeholder="bv. 100m, Gewigstoot, Verspring" required>
-            </div>
-            <div class="form-group">
-              <label data-i18n="lblGender">Geslag</label>
-              <select class="form-control" id="inpGender" required>
-                <option value="Seuns">Seuns</option>
-                <option value="Dogters">Dogters</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label data-i18n="lblAgeGroup">Ouderdomsgroep</label>
-              <select class="form-control" id="inpAgeGroup" required>
-                <option value="7">o/7</option>
-                <option value="8">o/8</option>
-                <option value="9">o/9</option>
-                <option value="10">o/10</option>
-                <option value="11">o/11</option>
-                <option value="12">o/12</option>
-                <option value="13">o/13</option>
-              </select>
-            </div>
+
+        <!-- Program Item Dropdown Selection Card -->
+        <div style="background: rgba(7, 18, 36, 0.75); border: 1.5px solid var(--lss-gold); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+          <div class="form-group" style="margin-bottom: 10px;">
+            <label style="color: var(--lss-gold); font-size: 13px; font-weight: 700;">1. Kies Item uit die Byeenkoms Program (Aftreklys):</label>
+            <select class="form-control" id="selectOfficialProgramItem" onchange="onOfficialItemChanged()" style="font-size: 14px; font-weight: 700; background: #040c17; color: var(--lss-gold);">
+              <option value="">-- Kies 'n item uit die Byeenkoms Program --</option>
+            </select>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label data-i18n="lblPlace">Plek (1, 2, 3...)</label>
-              <input type="number" class="form-control" id="inpPlace" min="1" max="50" value="1" required>
-            </div>
-            <div class="form-group">
-              <label data-i18n="lblAthleteName">Atleet Naam & Van</label>
-              <input type="text" class="form-control" id="inpAthleteName" placeholder="bv. Johan van der Merwe" required>
-            </div>
-            <div class="form-group">
-              <label data-i18n="lblSchool">Skool</label>
-              <input type="text" class="form-control" id="inpSchool" placeholder="bv. Laerskool Swartland" required>
-            </div>
+          <div id="officialItemHeaderInfo" style="font-size: 13px; color: var(--lss-text-light); border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px;">
+            Kies asseblief 'n item hierbo om te begin beoordeel.
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label data-i18n="lblResultValue">Tyd of Afstand</label>
-              <input type="text" class="form-control" id="inpResultValue" placeholder="bv. 12.34s of 4.56m" required>
-            </div>
-            <div class="form-group">
-              <label data-i18n="lblAsaPoints">ASA Punte (Opsioneel / Outomaties)</label>
-              <input type="number" class="form-control" id="inpAsaPoints" min="0" max="1200" placeholder="bv. 650">
-            </div>
-          </div>
-          <div style="margin-top: 10px;">
-            <button type="submit" class="btn-primary" id="btnSubmitResult">
-              💾 <span data-i18n="btnSaveResult">Stoor Uitslag na Firestore</span>
+        </div>
+
+        <!-- Interactive Officiating Table for Registered Athletes -->
+        <div id="officialAthletesBatchWrapper" style="display: none; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+            <h4 style="color: var(--lss-gold); font-size: 14px;" id="batchTableHeading">📋 Ingeskryfde Atlete vir Hierdie Item:</h4>
+            <button class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="saveOfficialBatchResults()">
+              💾 Stoor Alle Uitslae vir Item
             </button>
           </div>
-        </form>
+
+          <div style="overflow-x: auto; border: 1px solid var(--lss-border); border-radius: 8px; background: rgba(7, 18, 36, 0.8);">
+            <table class="styled-table" id="tableOfficialBatch">
+              <thead id="theadOfficialBatch">
+                <!-- Dynamically Populated Header based on Discipline -->
+              </thead>
+              <tbody id="tbodyOfficialBatch">
+                <!-- Dynamically Populated Rows -->
+              </tbody>
+            </table>
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; flex-wrap: wrap; gap: 8px;">
+            <div style="font-size: 12px; color: var(--lss-text-muted);" id="batchSummaryText">ASA Punte en plekke word outomaties bereken wanneer jy stoor.</div>
+            <button class="btn-primary" style="padding: 8px 18px; font-size: 13px;" onclick="saveOfficialBatchResults()">
+              💾 Stoor Alle Uitslae vir Item
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Single Athlete Fallback Form -->
+        <div style="margin-top: 20px; border-top: 1px dashed var(--lss-border); padding-top: 16px;">
+          <h4 style="color: var(--lss-text-muted); font-size: 13px; margin-bottom: 10px;">⚡ Enkele Atleet Vinnige Invoer (Opsioneel):</h4>
+          <form id="formOfficialResult" onsubmit="submitOfficialResult(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Kies Ingeskryfde Atleet uit Lys (Opsioneel)</label>
+                <select class="form-control" id="selectOfficialAthlete" onchange="onOfficialAthleteSelected()">
+                  <option value="">-- Kies 'n atleet uit die lys --</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label data-i18n="lblEventName">Item Naam</label>
+                <input type="text" class="form-control" id="inpEventName" placeholder="bv. 100m, Gewigstoot, Verspring" required>
+              </div>
+              <div class="form-group">
+                <label data-i18n="lblGender">Geslag</label>
+                <select class="form-control" id="inpGender" required>
+                  <option value="Seuns">Seuns</option>
+                  <option value="Dogters">Dogters</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label data-i18n="lblAgeGroup">Ouderdomsgroep</label>
+                <select class="form-control" id="inpAgeGroup" required>
+                  <option value="7">o/7</option>
+                  <option value="8">o/8</option>
+                  <option value="9">o/9</option>
+                  <option value="10">o/10</option>
+                  <option value="11">o/11</option>
+                  <option value="12">o/12</option>
+                  <option value="13">o/13</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label data-i18n="lblPlace">Plek (1, 2, 3...)</label>
+                <input type="number" class="form-control" id="inpPlace" min="1" max="50" value="1" required>
+              </div>
+              <div class="form-group">
+                <label data-i18n="lblAthleteName">Atleet Naam & Van</label>
+                <input type="text" class="form-control" id="inpAthleteName" placeholder="bv. Johan van der Merwe" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label data-i18n="lblSchool">Skool</label>
+                <input type="text" class="form-control" id="inpSchool" placeholder="bv. Laerskool Swartland" required>
+              </div>
+              <div class="form-group">
+                <label data-i18n="lblResultValue">Tyd of Afstand</label>
+                <input type="text" class="form-control" id="inpResultValue" placeholder="bv. 12.34s of 4.56m" required>
+              </div>
+              <div class="form-group">
+                <label data-i18n="lblAsaPoints">ASA Punte (Opsioneel / Outomaties)</label>
+                <input type="number" class="form-control" id="inpAsaPoints" min="0" max="1200" placeholder="bv. 650">
+              </div>
+            </div>
+            <div style="margin-top: 10px;">
+              <button type="submit" class="btn-primary" id="btnSubmitResult">
+                💾 <span data-i18n="btnSaveResult">Stoor Enkele Uitslag</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
       </div>
     </div>
 
@@ -1707,6 +1762,330 @@
       }).catch(err => {
         alert("Fout met generering: " + err.message);
       });
+    }
+
+    
+    // ==========================================
+    // OFFICIATING ENGINE (MATCHING APP LOGIC)
+    // ==========================================
+    let currentOfficialItem = null;
+    let currentItemAthletes = [];
+
+    function updateOfficialItemDropdown() {
+      const sel = document.getElementById("selectOfficialProgramItem");
+      if (!sel) return;
+
+      const currentVal = sel.value;
+      sel.innerHTML = `<option value="">-- Kies 'n item uit die Byeenkoms Program --</option>`;
+
+      programData.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.innerText = `#${p.itemNo} - ${p.eventName} (o/${p.ageGroup} ${p.gender}) [${p.venue || 'Hoofbaan'}]`;
+        sel.appendChild(opt);
+      });
+
+      if (currentVal && programData.some(p => p.id === currentVal)) {
+        sel.value = currentVal;
+      } else if (programData.length > 0 && !currentOfficialItem) {
+        sel.value = programData[0].id;
+        onOfficialItemChanged();
+      }
+    }
+
+    function onOfficialItemChanged() {
+      const sel = document.getElementById("selectOfficialProgramItem");
+      if (!sel) return;
+      const itemId = sel.value;
+
+      currentOfficialItem = programData.find(p => p.id === itemId);
+      const headerInfo = document.getElementById("officialItemHeaderInfo");
+      const batchWrapper = document.getElementById("officialAthletesBatchWrapper");
+      const athSel = document.getElementById("selectOfficialAthlete");
+
+      if (!currentOfficialItem) {
+        if (headerInfo) headerInfo.innerHTML = "Kies asseblief 'n item hierbo om te begin beoordeel.";
+        if (batchWrapper) batchWrapper.style.display = "none";
+        return;
+      }
+
+      const itemEvent = (currentOfficialItem.eventName || "").trim();
+      const itemAge = (currentOfficialItem.ageGroup || "").trim();
+      const itemGender = (currentOfficialItem.gender || "").trim();
+
+      // Find matching athletes registered for this specific event
+      currentItemAthletes = athletesData.filter(a => {
+        const aAge = (a.ageGroup || "").trim().replace("o/", "").replace("o", "");
+        const iAge = itemAge.replace("o/", "").replace("o", "");
+        const aGender = (a.gender || "").trim().toLowerCase();
+        const iGender = itemGender.toLowerCase();
+
+        const matchAge = aAge === iAge;
+        const matchGender = aGender.startsWith(iGender.substring(0, 1)) || iGender.startsWith(aGender.substring(0, 1));
+        const matchEvent = (a.events || []).some(e => {
+          const eClean = e.trim().toLowerCase();
+          const iClean = itemEvent.toLowerCase();
+          return eClean === iClean || eClean.includes(iClean) || iClean.includes(eClean);
+        });
+
+        return matchAge && matchGender && matchEvent;
+      });
+
+      if (headerInfo) {
+        headerInfo.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <strong style="color: var(--lss-gold); font-size: 15px;">#${currentOfficialItem.itemNo} - ${currentOfficialItem.eventName} (o/${currentOfficialItem.ageGroup} ${currentOfficialItem.gender})</strong>
+              <span style="color: var(--lss-text-muted); font-size: 12px; margin-left: 8px;">Baan/Veld: ${currentOfficialItem.venue || 'Hoofbaan'}</span>
+            </div>
+            <span style="background: rgba(16,185,129,0.15); color: #10B981; border: 1px solid #10B981; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 700;">
+              ${currentItemAthletes.length} Atlete Ingeskryf
+            </span>
+          </div>
+        `;
+      }
+
+      // Single form auto-fill
+      document.getElementById("inpEventName").value = currentOfficialItem.eventName;
+      document.getElementById("inpGender").value = currentOfficialItem.gender.toLowerCase().startsWith("d") ? "Dogters" : "Seuns";
+      document.getElementById("inpAgeGroup").value = currentOfficialItem.ageGroup.replace("o/", "").replace("o", "");
+
+      // Populate single form athlete dropdown
+      if (athSel) {
+        athSel.innerHTML = `<option value="">-- Kies 'n ingeskryfde atleet --</option>`;
+        currentItemAthletes.forEach(a => {
+          const opt = document.createElement("option");
+          opt.value = a.id;
+          opt.innerText = `${a.firstName} ${a.lastName} (${a.school})`;
+          opt.dataset.fn = a.firstName;
+          opt.dataset.ln = a.lastName;
+          opt.dataset.school = a.school;
+          athSel.appendChild(opt);
+        });
+      }
+
+      // Render batch table
+      if (batchWrapper) batchWrapper.style.display = "block";
+      renderOfficialBatchTable();
+    }
+
+    function onOfficialAthleteSelected() {
+      const sel = document.getElementById("selectOfficialAthlete");
+      if (!sel || !sel.value) return;
+      const opt = sel.options[sel.selectedIndex];
+      if (opt && opt.dataset.fn) {
+        document.getElementById("inpAthleteName").value = `${opt.dataset.fn} ${opt.dataset.ln}`;
+        document.getElementById("inpSchool").value = opt.dataset.school || "Laerskool Swartland";
+      }
+    }
+
+    function renderOfficialBatchTable() {
+      const thead = document.getElementById("theadOfficialBatch");
+      const tbody = document.getElementById("tbodyOfficialBatch");
+      if (!thead || !tbody || !currentOfficialItem) return;
+
+      const eventName = (currentOfficialItem.eventName || "").toLowerCase();
+      const isHighJump = eventName.includes("hoogspring") || eventName.includes("high jump");
+      const isTrack = eventName.includes("m") && !eventName.includes("jump") && !eventName.includes("put") && !eventName.includes("discus") && !eventName.includes("javelin") && !eventName.includes("spies") && !eventName.includes("gewig");
+
+      if (currentItemAthletes.length === 0) {
+        thead.innerHTML = `<tr><th>#</th><th>Atleet</th><th>Skool</th><th>Tyd / Afstand</th></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--lss-text-muted); padding: 18px;">Geen atlete tans vir hierdie spesifieke item ingeskryf nie. Gebruik die vinnige vorm hieronder as alternatief.</td></tr>`;
+        return;
+      }
+
+      if (isHighJump) {
+        thead.innerHTML = `
+          <tr>
+            <th style="width: 35px;">#</th>
+            <th>Atleet</th>
+            <th>Skool</th>
+            <th style="min-width: 140px;">Beste Hoogte (m)</th>
+            <th style="width: 80px;">Plek</th>
+          </tr>
+        `;
+        let html = "";
+        currentItemAthletes.forEach((ath, idx) => {
+          // Check if result already exists for this athlete
+          const existing = resultsData.find(r => 
+            (r.athleteName || "").toLowerCase().includes(ath.lastName.toLowerCase()) && 
+            (r.eventName || "").toLowerCase() === currentOfficialItem.eventName.toLowerCase()
+          );
+          const defaultVal = existing ? existing.resultValue : "";
+          const defaultPlace = existing ? existing.place : (idx + 1);
+
+          html += `
+            <tr id="batch_row_${ath.id}">
+              <td style="text-align: center; font-weight: 700; color: var(--lss-gold);">${idx + 1}</td>
+              <td><strong>${ath.firstName} ${ath.lastName}</strong></td>
+              <td>${ath.school}</td>
+              <td>
+                <select class="matrix-input" style="width: 120px;" id="batch_val_${ath.id}">
+                  <option value="">-- Geen --</option>
+                  ${[1.00, 1.05, 1.10, 1.15, 1.20, 1.25, 1.30, 1.35, 1.40, 1.45, 1.50, 1.55, 1.60].map(h => 
+                    `<option value="${h.toFixed(2)}m" ${defaultVal.includes(h.toFixed(2)) ? "selected" : ""}>${h.toFixed(2)}m</option>`
+                  ).join("")}
+                </select>
+              </td>
+              <td>
+                <input type="number" class="matrix-input" style="width: 60px;" id="batch_place_${ath.id}" value="${defaultPlace}" min="1" max="50">
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      } else if (isTrack) {
+        thead.innerHTML = `
+          <tr>
+            <th style="width: 35px;">#</th>
+            <th>Atleet</th>
+            <th>Skool</th>
+            <th style="min-width: 140px;">Amptelike Tyd (sek)</th>
+            <th style="width: 80px;">Plek</th>
+          </tr>
+        `;
+        let html = "";
+        currentItemAthletes.forEach((ath, idx) => {
+          const existing = resultsData.find(r => 
+            (r.athleteName || "").toLowerCase().includes(ath.lastName.toLowerCase()) && 
+            (r.eventName || "").toLowerCase() === currentOfficialItem.eventName.toLowerCase()
+          );
+          const defaultVal = existing ? existing.resultValue : "";
+          const defaultPlace = existing ? existing.place : (idx + 1);
+
+          html += `
+            <tr id="batch_row_${ath.id}">
+              <td style="text-align: center; font-weight: 700; color: var(--lss-gold);">${idx + 1}</td>
+              <td><strong>${ath.firstName} ${ath.lastName}</strong></td>
+              <td>${ath.school}</td>
+              <td>
+                <input type="text" class="matrix-input" style="width: 130px;" id="batch_val_${ath.id}" value="${defaultVal}" placeholder="bv. 12.34s">
+              </td>
+              <td>
+                <input type="number" class="matrix-input" style="width: 60px;" id="batch_place_${ath.id}" value="${defaultPlace}" min="1" max="50">
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      } else {
+        // Field distance events (Verspring, Gewigstoot, Skyfwerp, Spiesgooi)
+        thead.innerHTML = `
+          <tr>
+            <th style="width: 35px;">#</th>
+            <th>Atleet</th>
+            <th>Skool</th>
+            <th style="min-width: 140px;">Beste Afstand (m)</th>
+            <th style="width: 80px;">Plek</th>
+          </tr>
+        `;
+        let html = "";
+        currentItemAthletes.forEach((ath, idx) => {
+          const existing = resultsData.find(r => 
+            (r.athleteName || "").toLowerCase().includes(ath.lastName.toLowerCase()) && 
+            (r.eventName || "").toLowerCase() === currentOfficialItem.eventName.toLowerCase()
+          );
+          const defaultVal = existing ? existing.resultValue : "";
+          const defaultPlace = existing ? existing.place : (idx + 1);
+
+          html += `
+            <tr id="batch_row_${ath.id}">
+              <td style="text-align: center; font-weight: 700; color: var(--lss-gold);">${idx + 1}</td>
+              <td><strong>${ath.firstName} ${ath.lastName}</strong></td>
+              <td>${ath.school}</td>
+              <td>
+                <input type="text" class="matrix-input" style="width: 130px;" id="batch_val_${ath.id}" value="${defaultVal}" placeholder="bv. 4.56m">
+              </td>
+              <td>
+                <input type="number" class="matrix-input" style="width: 60px;" id="batch_place_${ath.id}" value="${defaultPlace}" min="1" max="50">
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      }
+    }
+
+    async function saveOfficialBatchResults() {
+      if (!currentOfficialItem || currentItemAthletes.length === 0) return;
+
+      const batch = db.batch();
+      let count = 0;
+
+      currentItemAthletes.forEach((ath) => {
+        const valEl = document.getElementById(`batch_val_${ath.id}`);
+        const placeEl = document.getElementById(`batch_place_${ath.id}`);
+
+        if (valEl && valEl.value.trim().length > 0) {
+          const resultVal = valEl.value.trim();
+          const place = parseInt(placeEl ? placeEl.value : "1", 10) || 1;
+          const points = calculateAsaPoints(currentOfficialItem.eventName, resultVal, place);
+
+          const docId = `res_${currentOfficialItem.id}_${ath.id}`;
+          const docRef = db.collection("results").doc(docId);
+
+          batch.set(docRef, {
+            eventName: currentOfficialItem.eventName,
+            gender: currentOfficialItem.gender,
+            ageGroup: currentOfficialItem.ageGroup,
+            place: place,
+            athleteName: `${ath.firstName} ${ath.lastName}`,
+            school: ath.school,
+            resultValue: resultVal,
+            asaPoints: points,
+            userId: "official_web_portal",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          count++;
+        }
+      });
+
+      if (count === 0) {
+        alert("Tik asseblief ten minste een atleet se tyd of afstand in voordat jy stoor.");
+        return;
+      }
+
+      try {
+        await batch.commit();
+        // Update program item status to Voltooi
+        await db.collection("program").doc(currentOfficialItem.id).update({
+          status: "Voltooi",
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert(`🎉 Sukses! ${count} uitslae vir #${currentOfficialItem.itemNo} (${currentOfficialItem.eventName}) suksesvol in Firestore gestoor!`);
+      } catch (err) {
+        alert("Fout met stoor van uitslae: " + err.message);
+      }
+    }
+
+    function calculateAsaPoints(eventName, resultStr, place) {
+      let val = parseFloat(resultStr.replace(/[^0-9.]/g, ''));
+      if (isNaN(val) || val <= 0) {
+        return place === 1 ? 750 : place === 2 ? 650 : place === 3 ? 550 : place === 4 ? 450 : 350;
+      }
+
+      const lower = eventName.toLowerCase();
+      let points = 500;
+
+      if (lower.includes("100m")) {
+        points = Math.round(Math.max(100, 1200 - (val - 10.5) * 150));
+      } else if (lower.includes("200m")) {
+        points = Math.round(Math.max(100, 1200 - (val - 22.0) * 80));
+      } else if (lower.includes("60m") || lower.includes("80m") || lower.includes("50m")) {
+        points = Math.round(Math.max(100, 1100 - (val - 8.0) * 120));
+      } else if (lower.includes("verspring") || lower.includes("long jump")) {
+        points = Math.round(Math.max(100, val * 180));
+      } else if (lower.includes("hoogspring") || lower.includes("high jump")) {
+        points = Math.round(Math.max(100, val * 450));
+      } else if (lower.includes("gewigstoot") || lower.includes("shot put")) {
+        points = Math.round(Math.max(100, val * 70));
+      } else if (lower.includes("skyfwerp") || lower.includes("discus") || lower.includes("spies") || lower.includes("javelin")) {
+        points = Math.round(Math.max(100, val * 30));
+      } else {
+        points = place === 1 ? 750 : place === 2 ? 650 : place === 3 ? 550 : 400;
+      }
+
+      return Math.min(1200, Math.max(50, points));
     }
 
     // 3. Digital Sheet Matrix State & Operations (Replacing CSV with Interactive Checkboxes)
@@ -2268,6 +2647,7 @@
         programData = [];
         snapshot.forEach((doc) => programData.push({ id: doc.id, ...doc.data() }));
         renderProgram();
+        updateOfficialItemDropdown();
         updateStats();
       }, (err) => console.warn("Program stream error:", err));
 
@@ -2281,6 +2661,7 @@
       db.collection("athletes").onSnapshot((snapshot) => {
         athletesData = [];
         snapshot.forEach((doc) => athletesData.push({ id: doc.id, ...doc.data() }));
+        if(currentOfficialItem) onOfficialItemChanged();
         updateStats();
       }, (err) => console.warn("Athletes stream error:", err));
     }
